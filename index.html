@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>懷恩堂 2026 聖經讀經</title>
+    <title>?�恩??2026 ?��?讀�?/title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2196F3">
     <link rel="icon" type="image/png" href="icons/icon-192x192.png">
@@ -30,21 +30,21 @@
 
 <body>
     <div class="loader">
-        <p>正在進入讀經計畫...</p>
+        <p>�?��?�入讀經�???..</p>
     </div>
 
     <script>
-        // PWA 註冊
+        // PWA 註�?
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // 指向未來的根目錄 Service Worker (目前先跳轉，讓子 APP 的 SW 運作)
+                // ?��??��??�根?��? Service Worker (?��??�跳轉�?讓�? APP ??SW ?��?)
                 console.log('e-GBC Platform Entry');
             });
         }
 
-        // 無痕重新導向：不保留此頁在瀏覽紀錄中
-        // 延遲一秒讓使用者感覺到「平台」的存在，或直接跳轉達成「無痕」
-        window.location.replace("./apps/012.BibleReading/app/index.html");
+        // ?��??�新導�?：�?保�?此�??�瀏覽紀?�中
+        // 延遲一秒�?使用?��?覺到?�平?�」�?存在，�??�接跳�??��??�無?��?
+        window.location.replace("./apps/2026BibleReading/app/index.html");
     </script>
 </body>
 
