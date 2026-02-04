@@ -1,0 +1,96 @@
+{
+    "monthlyTheology": {
+        "zh": [
+            "創世與應許：神是萬物的源頭，即便在軟弱中，祂的立約依然堅定。",
+            "救贖與聖潔：呼召百姓從奴役進入自由，建立與神相交的祭司國度。",
+            "曠野的供應：在試煉與流離中，學習單單仰望那從天而降的生命之糧。",
+            "律法與愛：神的話語是腳前的燈，帶領百姓進入應許的豐盛之地。",
+            "爭戰與得勝：靠著神的信心得地為業，見證祂在歷史中的奇妙作為。",
+            "王權與渴望：在人的失敗中，我們更深切盼望那永恆公義的大衛後裔。",
+            "智慧與敬畏：心靈的更新始於對神的尊崇，這才是一切知識的開端。",
+            "審判與慈愛：先知的吶喊提醒我們回轉，因為神的憐憫勝過審判。",
+            "歸回與重建：在廢墟中重新點燃希望，神正在恢復祂所應許的事工。",
+            "道成肉身：神與我們同在，將永恆的救贖帶進短暫的人間歷史。",
+            "使命與擴展：聖靈的能力超越邊界，將福音從耶路撒冷傳遍萬邦。",
+            "榮耀的盼望：新天新地的預覽，我們等待那終極的團圓與更新。"
+        ],
+        "en": [
+            "Creation & Promise: God is the source of all; His covenant remains firm even in our weakness.",
+            "Redemption & Holiness: Calling people from slavery into freedom, building a priestly kingdom.",
+            "Provision in Wilderness: In trials and wandering, learn to look up to the Bread of Life from heaven.",
+            "Law & Love: God's word is a lamp to our feet, leading us into the abundance of promise.",
+            "Battle & Victory: Take the land by faith, witnessing His wonderful deeds in history.",
+            "Kingship & Longing: In human failure, we long more deeply for the eternal Son of David.",
+            "Wisdom & Fear: Renewal starts with honoring God, which is the beginning of all knowledge.",
+            "Judgment & Mercy: The prophet's cry calls us back, for God's mercy triumphs over judgment.",
+            "Return & Rebuilding: Rekindling hope in ruins; God is restoring His promised work.",
+            "Incarnation: God is with us, bringing eternal redemption into transient human history.",
+            "Mission & Expansion: The Holy Spirit's power transcends borders, spreading the Gospel to all nations.",
+            "Glorious Hope: A preview of the new heaven and earth, waiting for the ultimate renewal."
+        ]
+    },
+    "feedback": {
+        "complete": {
+            "zh": [
+                "太棒了！您完成了本月所有的讀經目標！",
+                "感謝神！您忠心地完成了這個月的靈修旅程。",
+                "做得好！這份堅持將成為您屬靈生命的養分。",
+                "完成計畫！願神的話語常存在您心中。",
+                "您真的做到了，本月全勤完成！繼續保持！",
+                "生命被神的話語充滿，恭喜您完成本月進度。",
+                "您的毅力讓人敬佩，願您在恩典中繼續成長。",
+                "完成本月讀經，您是主所喜悅的小精兵！",
+                "願這個月的每個文字，都化作您生命中的力量。",
+                "恭喜！您成功追上了所有的聖經話語。"
+            ],
+            "en": [
+                "Amazing! You've completed all reading goals for this month!",
+                "Praise God! You've faithfully finished this month's spiritual journey.",
+                "Well done! This persistence will nourish your spiritual life.",
+                "Mission accomplished! May God's Word dwell in you richly.",
+                "You did it! 100% completion this month. Keep it up!",
+                "Life filled with God's Word! Congratulations on finishing.",
+                "Your perseverance is inspiring; keep growing in grace.",
+                "Month complete! You are a faithful soldier of the Lord!",
+                "May every word from this month turn into strength for your life.",
+                "Congrats! You've successfully caught up with all the scriptures."
+            ]
+        },
+        "encouragement": {
+            "zh": [
+                "別灰心，每一次閱讀都是與神的親近。",
+                "今天就開始一點點，進度一定能慢慢補上。",
+                "讀經不是比賽，而是與主同行的過程，加油！",
+                "還有一些章節沒讀完，我們一起努力補上吧。",
+                "沒關係，神在等著您隨時翻開聖經與祂說話。",
+                "只要開始，永遠不嫌晚！今天就讀一行也好。",
+                "願聖靈催促您的心，重新拾起這份屬靈的閱讀習慣。",
+                "雖然忙碌，但別忘了給靈糧留出一點時間。",
+                "目前的進度只是休息站，讓我們整理心情繼續出發。",
+                "加油！只要持續努力，您一定能完成目標的。"
+            ],
+            "en": [
+                "Don't lose heart; every bit of reading is closeness with God.",
+                "Start a little today, and you'll catch up step by step.",
+                "Bible reading isn't a race; it's a walk with the Lord. Keep going!",
+                "A few chapters left—let's work together to finish them.",
+                "It's okay; God is waiting for you to open the Bible anytime.",
+                "It's never too late! Even one line today is a great start.",
+                "May the Holy Spirit urge your heart to resume this spiritual habit.",
+                "Busy days happen, but don't forget to make time for spiritual food.",
+                "This progress is just a pit stop; let's refresh and carry on.",
+                "Keep going! With steady effort, you will reach your goal."
+            ]
+        },
+        "future": {
+            "zh": [
+                "這份進度還留在未來，我們可以預備心來領受。",
+                "即將到來的讀經旅程，願您帶著期待與神相遇。"
+            ],
+            "en": [
+                "This progress stays in the future; let's prepare our hearts to receive it.",
+                "As the reading journey approaches, may you meet God with expectation."
+            ]
+        }
+    }
+}

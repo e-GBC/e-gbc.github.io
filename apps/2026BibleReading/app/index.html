@@ -67,7 +67,8 @@
                     <div class="progress-header"
                         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                         <h3 data-i18n="monthlyProgress">本月進度</h3>
-                        <button class="btn-text-small" onclick="completeMonth()" data-i18n="monthComplete">本月完成</button>
+                        <button id="month-complete-btn" class="btn-text-small" onclick="completeMonth()"
+                            data-i18n="monthComplete">本月完成</button>
                     </div>
                     <div class="progress-bar-container">
                         <div class="progress-bar" id="monthly-bar" style="width: 0%;"></div>
@@ -79,7 +80,11 @@
                 </div>
 
                 <div class="annual-progress">
-                    <h3 data-i18n="yearlyProgress">年度進度</h3>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <h3 data-i18n="yearlyProgress" style="margin: 0;">年度進度</h3>
+                        <a href="summary.html" id="summary-btn" class="btn-blue" data-i18n="viewSummary">回顧動畫</a>
+                    </div>
                     <div class="progress-bar-container">
                         <div class="progress-bar" style="width: 0%;"></div>
                     </div>

@@ -37,6 +37,7 @@ const translations = {
         monthCleared: "已刪除 %m 的所有進度",
         confirmMarkMonth: "是否標記本月 %n 章為完成？",
         markMonthSuccess: "已標記本月 %n 章為完成",
+        viewSummary: "🎉 回顧動畫",
         months: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"]
     },
     en: {
@@ -77,6 +78,7 @@ const translations = {
         monthCleared: "Deleted all progress for %m",
         confirmMarkMonth: "Mark %n chapters as done for this month?",
         markMonthSuccess: "Marked %n chapters done for this month",
+        viewSummary: "🎉 Summary",
         months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     }
 };

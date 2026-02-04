@@ -4,11 +4,7 @@
 
 // State Management
 window.appState = {
-    currentDate: (() => {
-        const d = new Date();
-        const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
-        return new Date(utc + (3600000 * 8)); // Default to GMT+8
-    })(),
+    currentDate: getTodayGMT8(),
     readingPlan: [],
     parsedBibleZh: {},
     parsedBibleEn: {},
@@ -23,8 +19,8 @@ window.appState = {
 const appState = window.appState;
 
 // --- CONSTANTS ---
-const YEAR_START = new Date("2026-01-01");
-const YEAR_END = new Date("2026-12-31");
+const YEAR_START = new Date("2026-01-01T00:00:00+08:00");
+const YEAR_END = new Date("2026-12-31T23:59:59+08:00");
 const FONT_SIZES = [10, 12, 14, 16, 17, 18];
 
 const BOOK_MAP = {
@@ -139,10 +135,12 @@ function saveProgress() {
 
 // --- CORE LOGIC ---
 function getDateKey(date) {
-    const offset = 8 * 60;
     const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
-    const twDate = new Date(utc + (offset * 60000));
-    return twDate.toISOString().split('T')[0];
+    const tw = new Date(utc + (3600000 * 8));
+    const y = tw.getFullYear();
+    const m = String(tw.getMonth() + 1).padStart(2, '0');
+    const d = String(tw.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
 }
 
 function getTodayGMT8() {
@@ -396,6 +394,14 @@ function updateStats() {
     document.querySelector('#monthly-bar').style.width = `${Math.round(monthPercent)}%`;
     document.querySelector('.monthly-text').textContent =
         `${t.months[month]}: ${t.monthFinish || "Month Completion"} ${monthDone} / ${monthTotal} ${t.chapterUnit} ( ${Math.round(monthPercent)}% )`;
+
+    // Update Button Icon
+    const monthBtn = document.getElementById('month-complete-btn');
+    if (monthBtn) {
+        const isFinished = monthDone === monthTotal && monthTotal > 0;
+        const icon = isFinished ? "✅ " : "⬜ ";
+        monthBtn.textContent = icon + t.monthComplete;
+    }
 }
 
 window.completeMonth = () => {

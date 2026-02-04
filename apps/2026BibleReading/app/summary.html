@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>年度讀經總覽 - 2026 聖經讀經</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/summary.css">
+</head>
+
+<body>
+    <header class="summary-header">
+        <div class="nav-row">
+            <a href="index.html" class="back-link">
+                <span lang="zh">返回</span>
+                <span lang="en">Back</span>
+            </a>
+            <div class="month-selector">
+                <button class="month-arrow" id="prevMonth" onclick="changeSummaryMonth(-1)">◀</button>
+                <h1 class="current-month-label" id="monthLabel">--</h1>
+                <button class="month-arrow" id="nextMonth" onclick="changeSummaryMonth(1)">▶</button>
+            </div>
+            <div style="width: 48px;"></div> <!-- Spacer for balance -->
+        </div>
+    </header>
+
+    <main class="summary-container">
+        <!-- Progress Header Area -->
+        <div class="progress-header-card" id="progressHeader">
+            <div class="percentage-big" id="percentDisplay">0%</div>
+            <div class="text-area">
+                <p class="theology-text" id="theologyText"></p>
+                <p class="feedback-text" id="feedbackText"></p>
+            </div>
+        </div>
+
+        <div id="summaryContainer">
+            <!-- Daily Rows will be injected via JS -->
+        </div>
+    </main>
+
+    <script src="../data/bible.js"></script>
+    <script src="../data/bible_en.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/summary.js"></script>
+</body>
+
+</html>
