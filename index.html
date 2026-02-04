@@ -4,11 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>?·æ©??2026 ?–ç?è®€ç¶?/title>
+    <title>æ‡·æ©å ‚ 2026 è–ç¶“è®€ç¶“</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2196F3">
     <link rel="icon" type="image/png" href="icons/icon-192x192.png">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <style>
         body {
             margin: 0;
@@ -19,31 +18,17 @@
             justify-content: center;
             height: 100vh;
             font-family: sans-serif;
-        }
-
-        .loader {
-            text-align: center;
-            color: #2196F3;
+            color: #666;
         }
     </style>
 </head>
 
 <body>
-    <div class="loader">
-        <p>æ­?œ¨?²å…¥è®€ç¶“è???..</p>
+    <div style="text-align:center">
+        <p>æ­£åœ¨é€²å…¥è®€ç¶“è¨ˆç•«...</p>
     </div>
-
     <script>
-        // PWA è¨»å?
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                // ?‡å??ªä??„æ ¹?®é? Service Worker (?®å??ˆè·³è½‰ï?è®“å? APP ??SW ?‹ä?)
-                console.log('e-GBC Platform Entry');
-            });
-        }
-
-        // ?¡ç??æ–°å°å?ï¼šä?ä¿ç?æ­¤é??¨ç€è¦½ç´€?„ä¸­
-        // å»¶é²ä¸€ç§’è?ä½¿ç”¨?…æ?è¦ºåˆ°?Œå¹³?°ã€ç?å­˜åœ¨ï¼Œæ??´æ¥è·³è??”æ??Œç„¡?•ã€?
+        // ç„¡ç—•é‡æ–°å°å‘è‡³æ–°è·¯å¾‘
         window.location.replace("./apps/2026BibleReading/app/index.html");
     </script>
 </body>
