@@ -119,6 +119,26 @@ function isBehindGlobal() {
     return false;
 }
 
+function isBehindInMonth(monthIdx, year = 2026) {
+    const todayStr = getTWDateString();
+    const progress = window.appState.chapterProgress;
+
+    for (const plan of readingPlanData) {
+        const d = new Date(plan.date);
+        if (d.getFullYear() === year && d.getMonth() === monthIdx) {
+            if (plan.date < todayStr) {
+                if (plan.chapters) {
+                    const bookKey = BOOK_MAP[plan.book];
+                    for (const ch of plan.chapters) {
+                        if (!progress[`${bookKey}_${ch}`]) return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
 function renderMonth(monthIdx) {
     animationTimeouts.forEach(clearTimeout);
     animationTimeouts = [];
@@ -182,7 +202,7 @@ function renderMonth(monthIdx) {
     progressHeader.className = 'progress-header-card'; // Reset
     if (targetPercent === 100) {
         progressHeader.classList.add('blue');
-    } else if (isBehindGlobal()) {
+    } else if (isBehindInMonth(monthIdx)) {
         progressHeader.classList.add('orange');
     } else if (targetPercent > 0) {
         progressHeader.classList.add('green');

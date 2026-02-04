@@ -235,9 +235,35 @@ body {
     display: block;
 }
 
+/* Book Name Styling */
 .book-name {
     margin-right: 4px;
     font-weight: 500;
+}
+
+/* Responsive Fixes */
+@media (max-width: 600px) {
+    .progress-header-card {
+        flex-direction: column;
+        gap: 15px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .percentage-big {
+        font-size: 60px;
+        min-width: unset;
+        width: 100%;
+    }
+
+    .text-area {
+        align-items: center;
+    }
+
+    .feedback-text {
+        border-left: none;
+        border-top: 3px solid rgba(255, 255, 255, 0.5);
+    }
 }
 
 /* Scrollbar for Desktop */
