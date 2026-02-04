@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>懷恩堂 2026 聖經讀經</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2196F3">
+    <link rel="icon" type="image/png" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f4f7f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: sans-serif;
+        }
+
+        .loader {
+            text-align: center;
+            color: #2196F3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loader">
+        <p>正在進入讀經計畫...</p>
+    </div>
+
+    <script>
+        // PWA 註冊
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // 指向未來的根目錄 Service Worker (目前先跳轉，讓子 APP 的 SW 運作)
+                console.log('e-GBC Platform Entry');
+            });
+        }
+
+        // 無痕重新導向：不保留此頁在瀏覽紀錄中
+        // 延遲一秒讓使用者感覺到「平台」的存在，或直接跳轉達成「無痕」
+        window.location.replace("./apps/012.BibleReading/app/index.html");
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>懷恩堂編年式讀經</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2196F3">
+    <link rel="icon" type="image/png" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+
+    <script src="../data/bible.js"></script>
+    <script src="../data/bible_en.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/app.js" defer></script>
+    <script src="js/pwa-handler.js" defer></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('Service Worker registered', reg))
+                    .catch(err => console.log('Service Worker registration failed', err));
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Left Panel: Progress & Dashboard -->
+        <aside class="sidebar">
+            <header class="app-header">
+                <h1 data-i18n="appTitle">每日讀經</h1>
+                <button id="lang-toggle-dashboard" class="btn-text" onclick="toggleLanguage()"
+                    style="font-size: 0.9rem; position: absolute; right: 15px; top: 15px;">English</button>
+
+                <div class="date-controls">
+                    <button class="btn-icon-small" onclick="changeDay(-1)">◀</button>
+                    <span class="date-display">載入中...</span>
+                    <button class="btn-icon-small" onclick="changeDay(1)">▶</button>
+                </div>
+
+                <div style="margin-top: 5px;">
+                    <button id="btn-return-today" class="btn-text hidden" onclick="goToToday()" data-i18n="navBack">↺
+                        返回今日</button>
+                </div>
+
+                <div class="month-controls">
+                    <button class="btn-text" onclick="changeMonth(-1)" data-i18n="prevMonth">◀ 上個月</button>
+                    <button class="btn-text" onclick="changeMonth(1)" data-i18n="nextMonth">下個月 ▶</button>
+                </div>
+            </header>
+
+            <div id="catch-up-container" class="hidden"></div>
+
+            <div class="dashboard-content">
+                <div class="daily-card" id="today-card">
+                    <div class="card-content">
+                        <h2>載入中...</h2>
+                    </div>
+                </div>
+
+                <div class="monthly-progress">
+                    <div class="progress-header"
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <h3 data-i18n="monthlyProgress">本月進度</h3>
+                        <button class="btn-text-small" onclick="completeMonth()" data-i18n="monthComplete">本月完成</button>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="monthly-bar" style="width: 0%;"></div>
+                    </div>
+                    <div class="monthly-text-container"
+                        style="display: flex; justify-content: space-between; align-items: center;">
+                        <p class="monthly-text">載入中...</p>
+                    </div>
+                </div>
+
+                <div class="annual-progress">
+                    <h3 data-i18n="yearlyProgress">年度進度</h3>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 0%;"></div>
+                    </div>
+                    <p class="annual-text"><span data-i18n="totalProgress">累積完成</span> ...</p>
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <details>
+                    <summary data-i18n="toolTitle">工具</summary>
+                    <div class="data-controls" style="flex-direction: column; align-items: center; padding: 10px;">
+                        <div
+                            style="display: flex; gap: 20px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                            <button class="btn-text" onclick="exportData()" data-i18n="exportBtn">匯出備份</button>
+                            <button class="btn-text" onclick="importData()" data-i18n="importBtn">匯入備份</button>
+                            <a href="javascript:void(0)" onclick="createShortcut()" class="btn-text-small"
+                                data-i18n="shortcutBtn">匯出捷徑於桌面</a>
+                            <a href="guide.html" class="btn-text" data-i18n="guideBtn">使用說明書</a>
+                        </div>
+                    </div>
+                    <p style="font-size: 12px; color: #999; margin-top: 5px;" data-i18n="appNote">2026 GBC Bible</p>
+                </details>
+            </footer>
+        </aside>
+
+        <!-- Right Panel: Scripture Reader -->
+        <main class="main-content">
+            <header class="reader-header">
+                <button class="btn-text mobile-only" onclick="switchView('dashboard')">←</button>
+                <div class="chapter-title" data-i18n="readerTitleDefault">章節標題</div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button class="btn-text" onclick="toggleLanguage()" id="lang-toggle-reader"
+                        style="font-size: 0.9rem;">English</button>
+                    <button class="btn-icon" onclick="toggleFontSize()">Aa</button>
+                </div>
+            </header>
+
+            <div class="reader-scroll-area">
+                <div class="reader-content">
+                    <p class="placeholder-text" data-i18n="readerPlaceholder">請選擇本日經文開始閱讀</p>
+                </div>
+                <div class="reader-nav hidden"></div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
