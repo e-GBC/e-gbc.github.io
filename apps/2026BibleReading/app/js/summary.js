@@ -178,7 +178,7 @@ function renderMonth(monthIdx) {
 
     container.innerHTML = '';
     percentDisplay.textContent = '0%';
-    percentDisplay.classList.remove('hidden');
+    percentDisplay.classList.remove('vh-hide');
 
     const stamp = document.getElementById('stampContainer');
     if (stamp) stamp.classList.remove('animate');
@@ -272,7 +272,25 @@ function renderMonth(monthIdx) {
     }
 
     // Render Loop with Animation
+    let cumulativeDelay = 0;
     sortedDates.forEach((dateStr, index) => {
+        const dayPlans = groupedPlans[dateStr];
+
+        // Check if this day is fully completed
+        let isDayDone = true;
+        dayPlans.forEach(p => {
+            if (p.chapters) {
+                p.chapters.forEach(ch => {
+                    const bookKey = BOOK_MAP[p.book];
+                    if (!window.appState.chapterProgress[`${bookKey}_${ch}`]) isDayDone = false;
+                });
+            }
+        });
+
+        // Speed adjustment: completed day = 100ms delay, incomplete day = 20ms (80% faster)
+        const stepDelay = isDayDone ? 100 : 20;
+        cumulativeDelay += stepDelay;
+
         const timeoutId = setTimeout(() => {
             const dayPlans = groupedPlans[dateStr];
             const row = createDailyRow(dateStr, dayPlans, isEn);
@@ -294,7 +312,7 @@ function renderMonth(monthIdx) {
                         const stamp = document.getElementById('stampContainer');
                         const card = document.getElementById('progressHeader');
                         if (stamp) {
-                            percentDisplay.classList.add('hidden');
+                            percentDisplay.classList.add('vh-hide');
                             stamp.classList.add('animate');
                             card.classList.add('shake-it');
                             playSfx('stamp');
@@ -302,7 +320,7 @@ function renderMonth(monthIdx) {
                     }, 500);
                 }
             });
-        }, index * 100);
+        }, cumulativeDelay);
         animationTimeouts.push(timeoutId);
     });
 }
