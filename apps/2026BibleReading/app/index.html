@@ -116,33 +116,144 @@
                     <span class="tool-icon">📤</span>
                     <div class="tool-text">
                         <div class="tool-name" data-i18n="exportBtn">匯出備份</div>
-                        <div class="tool-desc">將您的讀經進度存成檔案</div>
+                        <div class="tool-desc" data-i18n="exportDesc">將讀經記錄存檔給其他裝置</div>
                     </div>
                 </button>
                 <button class="tool-item" type="button" onclick="importData()">
                     <span class="tool-icon">📥</span>
                     <div class="tool-text">
                         <div class="tool-name" data-i18n="importBtn">匯入備份</div>
-                        <div class="tool-desc">從檔案恢復讀經進度</div>
+                        <div class="tool-desc" data-i18n="importDesc">載入讀經記錄存檔</div>
+                    </div>
+                </button>
+                <button class="tool-item hidden" id="tool-complete-all" type="button" onclick="markAllPastDone()">
+                    <span class="tool-icon">⚡</span>
+                    <div class="tool-text">
+                        <div class="tool-name" data-i18n="completeAllBtn">完成全部進度</div>
+                        <div class="tool-desc" data-i18n="completeAllDesc">完成今天之前的所有進度</div>
                     </div>
                 </button>
                 <button class="tool-item" type="button" onclick="createShortcut()">
                     <span class="tool-icon">📱</span>
                     <div class="tool-text">
-                        <div class="tool-name" data-i18n="shortcutBtn">匯出捷徑於桌面</div>
-                        <div class="tool-desc">快速開啟讀經 App</div>
+                        <div class="tool-name" data-i18n="shortcutBtn">建立桌面捷徑</div>
+                        <div class="tool-desc" data-i18n="shortcutDesc">建立桌面捷徑永久入口</div>
                     </div>
                 </button>
                 <a href="guide.html" class="tool-item">
                     <span class="tool-icon">📖</span>
                     <div class="tool-text">
                         <div class="tool-name" data-i18n="guideBtn">使用說明書</div>
-                        <div class="tool-desc">了解如何使用本工具</div>
+                        <div class="tool-desc" data-i18n="guideDesc">了解如何使用本工具</div>
                     </div>
                 </a>
             </div>
-            <div class="sheet-footer">
-                <p data-i18n="appNote">2026 GBC Bible</p>
+            <div class="sheet-footer" style="padding: 10px 20px; text-align: center; border-top: 1px solid #f0f0f0;">
+                <p id="app-version" style="font-size: 10px; color: #bbb; margin: 0;">2026GBCBibleReading v.1.0.11</p>
+            </div>
+        </div>
+
+        <!-- Daily Install Prompt Banner -->
+        <div id="install-prompt-banner" class="install-banner hidden">
+            <div class="banner-content">
+                <span class="banner-icon">📱</span>
+                <div class="banner-text">
+                    <strong>安裝到手機桌面</strong>
+                    <span>隨時開啟，閱讀更流暢</span>
+                </div>
+            </div>
+            <div class="banner-actions">
+                <button class="btn-banner-close" onclick="closeInstallPrompt(true)">今天不再顯示</button>
+                <button class="btn-banner-action" onclick="createShortcut(); closeInstallPrompt(false)">立即安裝</button>
+            </div>
+        </div>
+
+        <!-- Onboarding / Tutorial Modal -->
+        <div id="guide-modal" class="guide-overlay hidden">
+            <div class="guide-box">
+                <!-- Page 1: Welcome -->
+                <div class="guide-page" id="guide-page-1">
+                    <div class="guide-header">
+                        <span class="guide-icon-top">✨</span>
+                        <h2 data-i18n="guideWelcomeTitle">歡迎加入</h2>
+                    </div>
+                    <div class="guide-body">
+                        <p class="welcome-text">歡迎您加入懷恩堂<br>2026年讀經計劃</p>
+                        <div class="welcome-visual">📖</div>
+                    </div>
+                    <div class="guide-footer">
+                        <button class="btn-guide-next full-width" onclick="nextGuidePage(2)">開始探索</button>
+                    </div>
+                </div>
+
+                <!-- Page 2: UI Tutorial -->
+                <div class="guide-page hidden" id="guide-page-2">
+                    <div class="guide-header">
+                        <h2 data-i18n="guideUsageTitle">使用方式</h2>
+                    </div>
+                    <div class="guide-body tutorial-items">
+                        <div class="t-item">
+                            <span class="t-icon">📖</span>
+                            <div class="t-text">
+                                <strong>開始閱讀</strong>
+                                <span>中文和合本、中英切換、字級放大</span>
+                            </div>
+                        </div>
+                        <div class="t-item">
+                            <span class="t-icon">↺</span>
+                            <div class="t-text">
+                                <strong>補回進度</strong>
+                                <span>跳回未讀進度，返回今日</span>
+                            </div>
+                        </div>
+                        <div class="t-item">
+                            <span class="t-icon">✅</span>
+                            <div class="t-text">
+                                <strong>快速補回</strong>
+                                <span>若您紀錄遺失，點擊「本月完成」快速追回進度</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="guide-footer">
+                        <button class="btn-guide-back" onclick="nextGuidePage(1)">返回</button>
+                        <button class="btn-guide-next" onclick="nextGuidePage(3)">下一步</button>
+                    </div>
+                </div>
+
+                <!-- Page 3: PWA Add -->
+                <div class="guide-page hidden" id="guide-page-3">
+                    <div class="guide-header">
+                        <h2 data-i18n="guidePWATitle">加入捷徑</h2>
+                    </div>
+                    <div class="guide-body">
+                        <div class="pwa-visual">📱</div>
+                        <p class="pwa-text">將讀經計畫加入桌面捷徑<br>享受如原生 App 的流暢體驗</p>
+                        <button class="btn-install-demo" onclick="createShortcut();">
+                            <span>點擊了解如何安裝</span>
+                        </button>
+                    </div>
+                    <div class="guide-footer">
+                        <button class="btn-guide-back" onclick="nextGuidePage(2)">返回</button>
+                        <button class="btn-guide-next" onclick="nextGuidePage(4)">下一步</button>
+                    </div>
+                </div>
+
+                <!-- Page 4: Q&A Hint -->
+                <div class="guide-page hidden" id="guide-page-4">
+                    <div class="guide-header">
+                        <h2 data-i18n="guideQATitle">準備好了嗎？</h2>
+                    </div>
+                    <div class="guide-body">
+                        <div class="qa-hint-box">
+                            <span class="qa-icon">❓</span>
+                            <p>若有任何疑問，歡迎點擊下方<br><strong>工具 > 使用說明書</strong></p>
+                        </div>
+                    </div>
+                    <div class="guide-footer">
+                        <button class="btn-guide-back" onclick="nextGuidePage(3)">返回</button>
+                        <button class="btn-guide-next" onclick="finishGuide()">進入 App</button>
+                    </div>
+                </div>
             </div>
         </div>
 

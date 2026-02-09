@@ -76,70 +76,177 @@ body {
 }
 
 /* Progress Header Card */
+/* Progress Header Card */
 .progress-header-card {
-    border-radius: 15px;
-    padding: 25px;
+    border-radius: 20px;
+    padding: 30px;
     color: white;
     margin-bottom: 25px;
     display: flex;
     align-items: center;
-    gap: 30px;
+    justify-content: flex-start;
+    gap: 40px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     transition: background 0.5s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .progress-header-card.blue {
     background: linear-gradient(135deg, #2196F3, #1565C0);
-    box-shadow: 0 10px 20px rgba(33, 150, 243, 0.3);
-}
-
-.progress-header-card.orange {
-    background: linear-gradient(135deg, #FF9800, #F57C00);
-    box-shadow: 0 10px 20px rgba(255, 152, 0, 0.3);
-}
-
-.progress-header-card.green {
-    background: linear-gradient(135deg, #4CAF50, #388E3C);
-    box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
-}
-
-.progress-header-card.gray {
-    background: linear-gradient(135deg, #9E9E9E, #616161);
-    box-shadow: 0 10px 20px rgba(158, 158, 158, 0.3);
+    box-shadow: 0 15px 30px rgba(33, 150, 243, 0.4);
 }
 
 .percentage-big {
-    font-size: 80px;
+    font-size: 85px;
     font-weight: 900;
     line-height: 1;
-    min-width: 160px;
+    min-width: 180px;
     text-align: center;
     font-family: 'Outfit', sans-serif;
     text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    transition: opacity 0.3s ease;
+}
+
+.percentage-big.hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
 .text-area {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+    z-index: 2;
 }
 
 .theology-text {
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 1.15rem;
+    font-weight: 600;
     margin: 0;
     opacity: 0.95;
-    line-height: 1.5;
+    line-height: 1.4;
 }
 
 .feedback-text {
-    font-size: 14px;
+    font-size: 0.95rem;
     margin: 0;
-    opacity: 0.8;
+    opacity: 0.85;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 10px 15px;
+    border-radius: 10px;
+    border-left: 4px solid rgba(255, 255, 255, 0.6);
+}
+
+/* --- COMPLETE STAMP --- */
+.stamp-container {
+    position: absolute;
+    left: 40px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-15deg) scale(5);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+    transition: none;
+}
+
+.stamp-container.animate {
+    animation: stampSlam 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.mission-stamp {
+    border: 6px double rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    padding: 10px 25px;
+    color: rgba(255, 255, 255, 0.95);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: 42px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
     background: rgba(255, 255, 255, 0.1);
-    padding: 8px 12px;
-    border-radius: 8px;
-    border-left: 3px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(2px);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    position: relative;
+    display: inline-block;
+}
+
+/* Grunge Texture for Stamp */
+.mission-stamp::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.3;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+}
+
+@keyframes stampSlam {
+    0% {
+        opacity: 0;
+        transform: translateY(-50%) translate(50px, -100px) rotate(-45deg) scale(5);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(-50%) rotate(-15deg) scale(1);
+    }
+}
+
+/* Screen Shake */
+.shake-it {
+    animation: screenShake 0.2s ease-in-out;
+}
+
+@keyframes screenShake {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    25% {
+        transform: translate(-2px, 2px);
+    }
+
+    50% {
+        transform: translate(2px, -2px);
+    }
+
+    75% {
+        transform: translate(-2px, -2px);
+    }
+}
+
+/* ... rest of existing styles ... */
+@media (max-width: 600px) {
+    .progress-header-card {
+        flex-direction: column;
+        gap: 15px;
+        padding: 30px 20px;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .percentage-big {
+        font-size: 70px;
+        min-width: unset;
+        width: 100%;
+    }
+
+    .stamp-container {
+        left: 50%;
+        margin-left: -100px;
+        /* Adjust based on stamp width */
+        top: 60px;
+    }
 }
 
 .summary-container {

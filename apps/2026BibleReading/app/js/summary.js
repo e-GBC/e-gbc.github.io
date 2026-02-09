@@ -15,28 +15,52 @@ function getTWDateString(date = new Date()) {
     return `${y}-${m}-${d}`;
 }
 
-function playPopSound() {
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
+function playSfx(type = 'pop') {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    if (type === 'pop') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+    } else if (type === 'stamp') {
+        // Slam / Thud sound
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const noise = audioCtx.createBufferSource();
+
+        // Brown noise feel
+        const bufferSize = audioCtx.sampleRate * 0.2;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        noise.buffer = buffer;
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.15);
+
+        gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+
+        osc.connect(gain);
+        noise.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(); noise.start();
+        osc.stop(audioCtx.currentTime + 0.2); noise.stop(audioCtx.currentTime + 0.2);
     }
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
-
-    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-
-    oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.1);
 }
 
 const BOOK_MAP = {
+    // ... rest of BOOK_MAP ...
     "創世記": "創", "出埃及記": "出", "利未記": "利", "民數記": "民", "申命記": "申",
     "約書亞記": "書", "士師記": "士", "路得記": "得", "撒母耳記上": "撒上", "撒母耳記下": "撒下",
     "列王紀上": "王上", "列王紀下": "王下", "歷代志上": "代上", "歷代志下": "代下",
@@ -154,6 +178,14 @@ function renderMonth(monthIdx) {
 
     container.innerHTML = '';
     percentDisplay.textContent = '0%';
+    percentDisplay.classList.remove('hidden');
+
+    const stamp = document.getElementById('stampContainer');
+    if (stamp) stamp.classList.remove('animate');
+    progressHeader.classList.remove('shake-it');
+
+    animationTimeouts.forEach(t => clearTimeout(t));
+    animationTimeouts = [];
 
     // Arrows state
     prevBtn.disabled = (monthIdx === 0);
@@ -255,6 +287,20 @@ function renderMonth(monthIdx) {
             requestAnimationFrame(() => {
                 row.classList.add('show');
                 checkCompletedChapters(row, true);
+
+                // Final Step: Mission Complete Stamp
+                if (index === sortedDates.length - 1 && targetPercent === 100) {
+                    setTimeout(() => {
+                        const stamp = document.getElementById('stampContainer');
+                        const card = document.getElementById('progressHeader');
+                        if (stamp) {
+                            percentDisplay.classList.add('hidden');
+                            stamp.classList.add('animate');
+                            card.classList.add('shake-it');
+                            playSfx('stamp');
+                        }
+                    }, 500);
+                }
             });
         }, index * 100);
         animationTimeouts.push(timeoutId);
@@ -287,8 +333,7 @@ function createDailyRow(dateStr, dayPlans, isEn) {
                 box.className = 'chapter-box';
                 if (isDone) box.dataset.done = "true";
 
-                let bookName = plan.book;
-                if (isEn) bookName = BOOK_MAP[plan.book] || plan.book;
+                let bookName = isEn ? (plan.book_en || plan.book) : plan.book;
 
                 const nameSpan = document.createElement('span');
                 nameSpan.className = `book-name ${bookName.length <= 2 ? 'short' : ''}`;
@@ -318,7 +363,7 @@ function checkCompletedChapters(rowElement, playSoundEnabled) {
         setTimeout(() => {
             box.classList.add('done');
             if (playSoundEnabled && !soundPlayed) {
-                playPopSound();
+                playSfx('pop');
                 soundPlayed = true;
             }
         }, idx * 60);

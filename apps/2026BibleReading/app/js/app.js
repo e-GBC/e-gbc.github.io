@@ -52,10 +52,72 @@ async function initApp() {
         applyLanguageStyle();
         renderDashboard();
         switchView('dashboard');
+        checkFirstTime();
+        checkDailyInstallPrompt();
     } catch (error) {
         console.error("Initialization Failed:", error);
     }
 }
+
+// --- DAILY INSTALL PROMPT ---
+function checkDailyInstallPrompt() {
+    // 1. Check if already in standalone mode
+    const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+    if (isStandalone) return;
+
+    // 2. Check if shown today
+    const todayStr = getDateKey(new Date());
+    const lastPromptDate = localStorage.getItem('last_install_prompt_date');
+
+    if (lastPromptDate !== todayStr) {
+        // Show banner after a short delay
+        setTimeout(() => {
+            const banner = document.getElementById('install-prompt-banner');
+            if (banner) banner.classList.remove('hidden');
+        }, 5000);
+    }
+}
+
+window.closeInstallPrompt = (todayOnly) => {
+    const banner = document.getElementById('install-prompt-banner');
+    if (banner) banner.classList.add('hidden');
+
+    if (todayOnly) {
+        const todayStr = getDateKey(new Date());
+        localStorage.setItem('last_install_prompt_date', todayStr);
+    }
+};
+
+// --- ONBOARDING GUIDE ---
+function checkFirstTime() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const forceShow = urlParams.get('showGuide') === 'true';
+    const isFinished = localStorage.getItem('bible_reading_guide_finished');
+    const totalChapters = Object.keys(appState.chapterProgress).length;
+
+    // Auto show if forced OR never finished OR if progress is 0 (new user)
+    if (forceShow || !isFinished || totalChapters === 0) {
+        showGuide();
+    }
+}
+
+window.showGuide = () => {
+    const modal = document.getElementById('guide-modal');
+    if (modal) modal.classList.remove('hidden');
+    nextGuidePage(1);
+};
+
+window.nextGuidePage = (pageNum) => {
+    document.querySelectorAll('.guide-page').forEach(pg => pg.classList.add('hidden'));
+    const target = document.getElementById(`guide-page-${pageNum}`);
+    if (target) target.classList.remove('hidden');
+};
+
+window.finishGuide = () => {
+    localStorage.setItem('bible_reading_guide_finished', 'true');
+    const modal = document.getElementById('guide-modal');
+    if (modal) modal.classList.add('hidden');
+};
 
 // --- LANGUAGE HANDLING ---
 window.toggleLanguage = () => {
@@ -364,6 +426,32 @@ window.finishAndHome = (cBook, cChap) => {
     switchView('dashboard');
 };
 
+window.markAllPastDone = () => {
+    const todayStr = getDateKey(getTodayGMT8());
+    const unreadPlans = appState.readingPlan.filter(p => p.date < todayStr);
+    let count = 0;
+
+    unreadPlans.forEach(p => {
+        if (Array.isArray(p.chapters)) {
+            p.chapters.forEach(ch => {
+                const key = `${BOOK_MAP[p.book]}_${ch}`;
+                if (!appState.chapterProgress[key]) {
+                    appState.chapterProgress[key] = true;
+                    count++;
+                }
+            });
+        }
+    });
+
+    if (count > 0) {
+        const msg = translations[appState.currentLang].confirmMarkAll.replace('%n', count);
+        if (confirm(msg)) {
+            saveProgress();
+            renderDashboard();
+        }
+    }
+};
+
 // --- STATS ---
 function updateStats() {
     const t = translations[appState.currentLang];
@@ -402,6 +490,24 @@ function updateStats() {
         const icon = isFinished ? "✅ " : "⬜ ";
         monthBtn.textContent = icon + t.monthComplete;
     }
+
+    // Toggle Visibility of "Mark All Past Done" Tool
+    const todayStr = getDateKey(getTodayGMT8());
+    const hasUnreadPast = appState.readingPlan.some(p => {
+        if (p.date < todayStr && Array.isArray(p.chapters)) {
+            return p.chapters.some(ch => !appState.chapterProgress[`${BOOK_MAP[p.book]}_${ch}`]);
+        }
+        return false;
+    });
+
+    const completeBtn = document.getElementById('tool-complete-all');
+    if (completeBtn) {
+        completeBtn.classList.toggle('hidden', !hasUnreadPast);
+    }
+
+    // Ensure Summary button is visible
+    const summaryBtn = document.getElementById('summary-btn');
+    if (summaryBtn) summaryBtn.classList.remove('hidden');
 }
 
 window.completeMonth = () => {
