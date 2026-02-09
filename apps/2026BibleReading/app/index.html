@@ -20,12 +20,22 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // Delay SW registration slightly to avoid being flagged by aggressive security filters on immediate load
-                setTimeout(() => {
-                    navigator.serviceWorker.register('./service-worker.js')
-                        .then(reg => console.log('Service Worker registered', reg))
-                        .catch(err => console.log('Service Worker registration failed', err));
-                }, 3000);
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => {
+                        console.log('SW Registered');
+                        // Periodically check for updates
+                        setInterval(() => { reg.update(); }, 60 * 60 * 1000); // Check every hour
+                    })
+                    .catch(err => console.log('SW Error:', err));
+            });
+
+            // Handle automatic reload when the new service worker takes control
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
             });
         }
     </script>
@@ -147,9 +157,16 @@
                         <div class="tool-desc" data-i18n="guideDesc">了解如何使用本工具</div>
                     </div>
                 </a>
+                <button class="tool-item" type="button" onclick="forceUpdateApp()">
+                    <span class="tool-icon">🔄</span>
+                    <div class="tool-text">
+                        <div class="tool-name" data-i18n="updateBtn">手動更新</div>
+                        <div class="tool-desc" data-i18n="updateDesc">連線更新至最新版本資料</div>
+                    </div>
+                </button>
             </div>
             <div class="sheet-footer" style="padding: 10px 20px; text-align: center; border-top: 1px solid #f0f0f0;">
-                <p id="app-version" style="font-size: 10px; color: #bbb; margin: 0;">2026GBCBibleReading v.1.0.13</p>
+                <p id="app-version" style="font-size: 10px; color: #bbb; margin: 0;">2026GBCBibleReading v.1.0.14</p>
             </div>
         </div>
 

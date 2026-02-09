@@ -24,20 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initPWALogic() {
     // 1. Priority: Handle In-App Browsers (LINE/FB/WeChat)
-    // If we're inside LINE/FB AND not in standalone mode, force the browser notice.
     if (isInAppBrowser && !isStandalone) {
-        window.suppressGuides = true; // Global flag to stop index.html from showing guides
+        window.suppressGuides = true;
         showInAppBrowserOverlay();
-        return; // Stop here, don't show other prompts
-    }
-
-    // 2. Already installed? Hide shortcut buttons
-    if (isStandalone) {
-        document.querySelectorAll('[data-i18n="shortcutBtn"]').forEach(el => el.classList.add('hidden'));
         return;
     }
 
-    // 3. Catch Android/Desktop Install Prompt
+    // 2. Catch Android/Desktop Install Prompt
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;

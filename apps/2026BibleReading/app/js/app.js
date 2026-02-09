@@ -711,6 +711,26 @@ window.toggleTools = () => {
     }
 };
 
+window.forceUpdateApp = () => {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+            for (let registration of registrations) {
+                registration.update();
+            }
+            // Clear cache and reload
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    for (let name of names) caches.delete(name);
+                });
+            }
+            alert(appState.currentLang === 'en' ? "Checking for updates and clearing cache..." : "正在檢查更新並清除快取...");
+            window.location.reload(true);
+        });
+    } else {
+        window.location.reload(true);
+    }
+};
+
 window.createShortcut = () => {
     alert("請點擊瀏覽器選單中的『安裝應用程式』或『加入主畫面』來建立桌面捷徑。");
 };
