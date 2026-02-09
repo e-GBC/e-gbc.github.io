@@ -85,7 +85,7 @@ const translations = {
         toolTitle: "Tools",
         shortcutBtn: "Add to Desktop",
         shortcutDesc: "Establish permanent desktop entry",
-        guideBtn: "📖 User Guide",
+        guideBtn: "❓ User Guide",
         guideDesc: "Learn how to use this tool",
         confirmMarkAll: "Mark all %n unread chapters before today as done?",
         confirmClearMonth: "Clear all progress for this month?",
