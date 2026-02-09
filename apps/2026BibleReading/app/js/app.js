@@ -712,24 +712,50 @@ window.toggleTools = () => {
 };
 
 window.forceUpdateApp = () => {
+    const msg = appState.currentLang === 'en' ? "Checking for updates..." : "正在檢查更新並清除快取...";
+    showToast(msg);
+
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(registrations => {
             for (let registration of registrations) {
                 registration.update();
             }
-            // Clear cache and reload
             if ('caches' in window) {
                 caches.keys().then(names => {
                     for (let name of names) caches.delete(name);
                 });
             }
-            alert(appState.currentLang === 'en' ? "Checking for updates and clearing cache..." : "正在檢查更新並清除快取...");
-            window.location.reload(true);
+            // Delay reload to let user see the message
+            setTimeout(() => {
+                window.location.reload(true);
+            }, 2000);
         });
     } else {
-        window.location.reload(true);
+        setTimeout(() => {
+            window.location.reload(true);
+        }, 1000);
     }
 };
+
+function showToast(message) {
+    let toast = document.getElementById('app-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'app-toast';
+        toast.style = `
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 12px 24px;
+            border-radius: 50px; z-index: 10000; font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: opacity 0.3s;
+        `;
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    setTimeout(() => {
+        toast.style.opacity = '0';
+    }, 4000);
+}
 
 window.createShortcut = () => {
     alert("請點擊瀏覽器選單中的『安裝應用程式』或『加入主畫面』來建立桌面捷徑。");
