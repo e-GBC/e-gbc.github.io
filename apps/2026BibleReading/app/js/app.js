@@ -52,8 +52,16 @@ async function initApp() {
         applyLanguageStyle();
         renderDashboard();
         switchView('dashboard');
-        checkFirstTime();
-        checkDailyInstallPrompt();
+
+        // New Logic Priority:
+        // 1. (Handled by pwa-handler.js) - Stop if in In-App Browser
+        // 2. Check for Welcome Guide (First Time / New User)
+        const showedGuide = checkFirstTime();
+
+        // 3. If Welcome Guide didn't show, check for Install Prompt
+        if (!showedGuide) {
+            checkDailyInstallPrompt();
+        }
     } catch (error) {
         console.error("Initialization Failed:", error);
     }
@@ -61,6 +69,8 @@ async function initApp() {
 
 // --- DAILY INSTALL PROMPT ---
 function checkDailyInstallPrompt() {
+    if (window.suppressGuides) return; // Priority 1 blockage
+
     // 1. Check if already in standalone mode
     const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
     if (isStandalone) return;
@@ -74,7 +84,7 @@ function checkDailyInstallPrompt() {
         setTimeout(() => {
             const banner = document.getElementById('install-prompt-banner');
             if (banner) banner.classList.remove('hidden');
-        }, 5000);
+        }, 3000);
     }
 }
 
@@ -90,15 +100,20 @@ window.closeInstallPrompt = (todayOnly) => {
 
 // --- ONBOARDING GUIDE ---
 function checkFirstTime() {
+    if (window.suppressGuides) return false; // Priority 1 blockage
+
     const urlParams = new URLSearchParams(window.location.search);
     const forceShow = urlParams.get('showGuide') === 'true';
     const isFinished = localStorage.getItem('bible_reading_guide_finished');
     const totalChapters = Object.keys(appState.chapterProgress).length;
 
-    // Auto show if forced OR never finished OR if progress is 0 (new user)
-    if (forceShow || !isFinished || totalChapters === 0) {
+    // Priority 2: Auto show if forced OR (never finished AND progress is 0)
+    // We treat totalChapters === 0 as a "Fresh User" indicator
+    if (forceShow || (!isFinished && totalChapters === 0)) {
         showGuide();
+        return true;
     }
+    return false;
 }
 
 window.showGuide = () => {
@@ -483,12 +498,48 @@ function updateStats() {
     document.querySelector('.monthly-text').textContent =
         `${t.months[month]}: ${t.monthFinish || "Month Completion"} ${monthDone} / ${monthTotal} ${t.chapterUnit} ( ${Math.round(monthPercent)}% )`;
 
-    // Update Button Icon
+    // Update Button Icon & Text
     const monthBtn = document.getElementById('month-complete-btn');
     if (monthBtn) {
+        const today = getTodayGMT8();
+        const todayStr = getDateKey(today);
+        const isViewingCurrentMonth = (viewDate.getFullYear() === today.getFullYear() && viewDate.getMonth() === today.getMonth());
+
+        let unreadUpToToday = 0;
+        appState.readingPlan.forEach(p => {
+            if (p.date <= todayStr && Array.isArray(p.chapters)) {
+                p.chapters.forEach(ch => {
+                    if (!appState.chapterProgress[`${BOOK_MAP[p.book]}_${ch}`]) unreadUpToToday++;
+                });
+            }
+        });
+
         const isFinished = monthDone === monthTotal && monthTotal > 0;
-        const icon = isFinished ? "✅ " : "⬜ ";
-        monthBtn.textContent = icon + t.monthComplete;
+
+        monthBtn.classList.remove('hidden');
+        if (isFinished) {
+            // Mode: Clear (100% Done)
+            monthBtn.textContent = "✖️ " + t.clearProgress;
+            monthBtn.dataset.mode = 'clear';
+            monthBtn.style.background = '#95a5a6'; // Gray for clear
+        } else if (isViewingCurrentMonth) {
+            if (unreadUpToToday > 0) {
+                // Mode: Catchup (Current Month, Unread exists)
+                monthBtn.textContent = "⬜ " + t.catchUpToToday;
+                monthBtn.dataset.mode = 'catchup';
+                monthBtn.style.background = ''; // Default orange
+            } else {
+                // Caught up up to today! Show "Clear Progress" instead of hiding
+                monthBtn.textContent = "✖️ " + t.clearProgress;
+                monthBtn.dataset.mode = 'clear';
+                monthBtn.style.background = '#95a5a6'; // Gray for clear
+            }
+        } else {
+            // Mode: Month Complete (Previous/Future Months, Unread exists)
+            monthBtn.textContent = "⬜ " + t.monthComplete;
+            monthBtn.dataset.mode = 'month';
+            monthBtn.style.background = ''; // Default orange
+        }
     }
 
     // Toggle Visibility of "Mark All Past Done" Tool
@@ -515,31 +566,89 @@ window.completeMonth = () => {
     const month = viewDate.getMonth();
     const year = viewDate.getFullYear();
     const t = translations[appState.currentLang];
-    const monthPlans = appState.readingPlan.filter(p => {
-        const d = new Date(p.date);
-        return d.getFullYear() === year && d.getMonth() === month;
-    });
+    const monthBtn = document.getElementById('month-complete-btn');
+    const mode = monthBtn ? monthBtn.dataset.mode : 'month';
 
-    let unreadKeys = [];
-    monthPlans.forEach(p => p.chapters?.forEach(ch => {
-        const key = `${BOOK_MAP[p.book]}_${ch}`;
-        if (!appState.chapterProgress[key]) unreadKeys.push(key);
-    }));
+    if (mode === 'catchup') {
+        const todayStr = getDateKey(getTodayGMT8());
+        const pastAndTodayPlans = appState.readingPlan.filter(p => p.date <= todayStr);
+        let unreadCount = 0;
+        pastAndTodayPlans.forEach(p => p.chapters?.forEach(ch => {
+            if (!appState.chapterProgress[`${BOOK_MAP[p.book]}_${ch}`]) unreadCount++;
+        }));
 
-    if (unreadKeys.length === 0) {
-        if (confirm(t.confirmClearMonth)) {
-            monthPlans.forEach(p => p.chapters?.forEach(ch => delete appState.chapterProgress[`${BOOK_MAP[p.book]}_${ch}`]));
-            saveProgress();
-            renderDashboard();
-            alert(t.monthCleared.replace('%m', t.months[month]));
+        if (unreadCount > 0) {
+            if (confirm(t.confirmMarkAll.replace('%n', unreadCount))) {
+                pastAndTodayPlans.forEach(p => p.chapters?.forEach(ch => {
+                    appState.chapterProgress[`${BOOK_MAP[p.book]}_${ch}`] = true;
+                }));
+                saveProgress();
+                renderDashboard();
+                alert(t.markMonthSuccess.replace('%n', unreadCount));
+            }
+        }
+    } else if (mode === 'clear') {
+        const today = getTodayGMT8();
+        const todayStr = getDateKey(today);
+        const isViewingCurrentMonth = (viewDate.getFullYear() === today.getFullYear() && viewDate.getMonth() === today.getMonth());
+
+        // Calculate month completion for the viewed month
+        let monthTotal = 0, monthDone = 0;
+        const monthPlans = appState.readingPlan.filter(p => {
+            const d = new Date(p.date);
+            const match = d.getFullYear() === year && d.getMonth() === month;
+            if (match && Array.isArray(p.chapters)) {
+                p.chapters.forEach(ch => {
+                    monthTotal++;
+                    if (appState.chapterProgress[`${BOOK_MAP[p.book]}_${ch}`]) monthDone++;
+                });
+            }
+            return match;
+        });
+        const isFinished = monthDone === monthTotal && monthTotal > 0;
+
+        // If current month and not fully finished, only clear up to today
+        if (isViewingCurrentMonth && !isFinished) {
+            if (confirm(t.confirmClearMonth)) {
+                monthPlans.forEach(p => {
+                    if (p.date <= todayStr && Array.isArray(p.chapters)) {
+                        p.chapters.forEach(ch => delete appState.chapterProgress[`${BOOK_MAP[p.book]}_${ch}`]);
+                    }
+                });
+                saveProgress();
+                renderDashboard();
+                alert(t.monthCleared.replace('%m', t.months[month]));
+            }
+        } else {
+            // Clear the entire viewed month
+            if (confirm(t.confirmClearMonth)) {
+                monthPlans.forEach(p => p.chapters?.forEach(ch => delete appState.chapterProgress[`${BOOK_MAP[p.book]}_${ch}`]));
+                saveProgress();
+                renderDashboard();
+                alert(t.monthCleared.replace('%m', t.months[month]));
+            }
         }
     } else {
-        const count = unreadKeys.length;
-        if (confirm(t.confirmMarkMonth.replace('%n', count))) {
-            unreadKeys.forEach(key => appState.chapterProgress[key] = true);
-            saveProgress();
-            renderDashboard();
-            alert(t.markMonthSuccess.replace('%n', count));
+        // Mode: Month (Complete the viewed month)
+        const monthPlans = appState.readingPlan.filter(p => {
+            const d = new Date(p.date);
+            return d.getFullYear() === year && d.getMonth() === month;
+        });
+
+        let unreadKeys = [];
+        monthPlans.forEach(p => p.chapters?.forEach(ch => {
+            const key = `${BOOK_MAP[p.book]}_${ch}`;
+            if (!appState.chapterProgress[key]) unreadKeys.push(key);
+        }));
+
+        if (unreadKeys.length > 0) {
+            const count = unreadKeys.length;
+            if (confirm(t.confirmMarkMonth.replace('%n', count))) {
+                unreadKeys.forEach(key => appState.chapterProgress[key] = true);
+                saveProgress();
+                renderDashboard();
+                alert(t.markMonthSuccess.replace('%n', count));
+            }
         }
     }
 };
