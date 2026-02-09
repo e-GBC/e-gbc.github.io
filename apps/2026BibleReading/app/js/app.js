@@ -477,3 +477,25 @@ window.toggleFontSize = () => {
     const style = document.getElementById('font-size-style') || document.head.appendChild(Object.assign(document.createElement('style'), { id: 'font-size-style' }));
     style.innerHTML = `.reader-content p { font-size: ${FONT_SIZES[appState.fontSizeIndex]}pt !important; }`;
 };
+
+// --- TOOL SHEET ---
+window.toggleTools = () => {
+    const overlay = document.getElementById('tools-overlay');
+    const sheet = document.getElementById('tools-sheet');
+    if (!overlay || !sheet) return;
+
+    const isHidden = sheet.classList.contains('hidden');
+    if (isHidden) {
+        overlay.classList.remove('hidden');
+        sheet.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Prevent background scroll
+    } else {
+        overlay.classList.add('hidden');
+        sheet.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+};
+
+window.createShortcut = () => {
+    alert("請點擊瀏覽器選單中的『安裝應用程式』或『加入主畫面』來建立桌面捷徑。");
+};

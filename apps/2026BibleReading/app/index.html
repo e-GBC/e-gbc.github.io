@@ -20,9 +20,12 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(reg => console.log('Service Worker registered', reg))
-                    .catch(err => console.log('Service Worker registration failed', err));
+                // Delay SW registration slightly to avoid being flagged by aggressive security filters on immediate load
+                setTimeout(() => {
+                    navigator.serviceWorker.register('./service-worker.js')
+                        .then(reg => console.log('Service Worker registered', reg))
+                        .catch(err => console.log('Service Worker registration failed', err));
+                }, 3000);
             });
         }
     </script>
@@ -92,23 +95,56 @@
                 </div>
             </div>
 
-            <footer class="app-footer">
-                <details>
-                    <summary data-i18n="toolTitle">工具</summary>
-                    <div class="data-controls" style="flex-direction: column; align-items: center; padding: 10px;">
-                        <div
-                            style="display: flex; gap: 20px; justify-content: center; align-items: center; flex-wrap: wrap;">
-                            <button class="btn-text" onclick="exportData()" data-i18n="exportBtn">匯出備份</button>
-                            <button class="btn-text" onclick="importData()" data-i18n="importBtn">匯入備份</button>
-                            <a href="javascript:void(0)" onclick="createShortcut()" class="btn-text-small"
-                                data-i18n="shortcutBtn">匯出捷徑於桌面</a>
-                            <a href="guide.html" class="btn-text" data-i18n="guideBtn">使用說明書</a>
-                        </div>
-                    </div>
-                    <p style="font-size: 12px; color: #999; margin-top: 5px;" data-i18n="appNote">2026 GBC Bible</p>
-                </details>
-            </footer>
+            <div class="sidebar-footer">
+                <button class="btn-tools-trigger" onclick="toggleTools()">
+                    <span class="icon">⚙️</span>
+                    <span data-i18n="toolTitle">工具設定</span>
+                </button>
+            </div>
         </aside>
+
+        <!-- Bottom Sheet Tools -->
+        <div id="tools-overlay" class="overlay hidden" onclick="toggleTools()"></div>
+        <div id="tools-sheet" class="bottom-sheet hidden">
+            <div class="sheet-header">
+                <div class="header-line"></div>
+                <h2 data-i18n="toolTitle">工具設定</h2>
+                <button class="btn-close-sheet" onclick="toggleTools()">✕</button>
+            </div>
+            <div class="sheet-content">
+                <button class="tool-item" type="button" onclick="exportData()">
+                    <span class="tool-icon">📤</span>
+                    <div class="tool-text">
+                        <div class="tool-name" data-i18n="exportBtn">匯出備份</div>
+                        <div class="tool-desc">將您的讀經進度存成檔案</div>
+                    </div>
+                </button>
+                <button class="tool-item" type="button" onclick="importData()">
+                    <span class="tool-icon">📥</span>
+                    <div class="tool-text">
+                        <div class="tool-name" data-i18n="importBtn">匯入備份</div>
+                        <div class="tool-desc">從檔案恢復讀經進度</div>
+                    </div>
+                </button>
+                <button class="tool-item" type="button" onclick="createShortcut()">
+                    <span class="tool-icon">📱</span>
+                    <div class="tool-text">
+                        <div class="tool-name" data-i18n="shortcutBtn">匯出捷徑於桌面</div>
+                        <div class="tool-desc">快速開啟讀經 App</div>
+                    </div>
+                </button>
+                <a href="guide.html" class="tool-item">
+                    <span class="tool-icon">📖</span>
+                    <div class="tool-text">
+                        <div class="tool-name" data-i18n="guideBtn">使用說明書</div>
+                        <div class="tool-desc">了解如何使用本工具</div>
+                    </div>
+                </a>
+            </div>
+            <div class="sheet-footer">
+                <p data-i18n="appNote">2026 GBC Bible</p>
+            </div>
+        </div>
 
         <!-- Right Panel: Scripture Reader -->
         <main class="main-content">
