@@ -122,11 +122,13 @@ body {
     background-color: var(--card-bg);
     border: 2px solid var(--primary-color);
     border-radius: 12px;
-    padding: var(--spacing-lg);
+    padding: 0;
+    /* Remove padding to allow flush header */
     margin-bottom: var(--spacing-lg);
     text-align: center;
     position: relative;
-    /* For stamp */
+    overflow: hidden;
+    /* Ensure header bar is clipped by card corners */
 }
 
 .daily-card.completed {
@@ -134,9 +136,40 @@ body {
     background-color: #eafaf1;
 }
 
-.card-content h2 {
-    font-size: var(--font-xl);
-    margin-bottom: 8px;
+.card-content .titles-container {
+    background-color: var(--primary-color);
+    /* Match theme color */
+    color: white;
+    padding: 15px 10px;
+    border-radius: 0;
+    /* Flush with card corners via parent overflow:hidden */
+    margin-bottom: 10px;
+    display: block;
+    width: 100%;
+}
+
+.chapters-area {
+    padding: 0 20px 20px;
+}
+
+.card-content .book-group {
+    padding: 10px 0;
+}
+
+.titles-container h2 {
+    color: white !important;
+    font-size: 1.25rem;
+    /* Slightly smaller for better fit */
+    margin: 0;
+    line-height: 1.3;
+    padding: 0 10px;
+    /* Extra side padding */
+}
+
+.book-group h3 {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin: 15px 0 10px;
 }
 
 .card-content .chapters {
@@ -222,8 +255,9 @@ body {
 
 .progress-bar-container {
     background-color: #eee;
-    height: 8px;
-    border-radius: 4px;
+    height: 12px;
+    /* Thicker (1.5x of 8px) */
+    border-radius: 6px;
     overflow: hidden;
     margin: 10px 0;
 }
@@ -232,6 +266,37 @@ body {
     background: var(--accent-color);
     height: 100%;
     transition: width 0.3s;
+}
+
+/* Catch Up Banner Styles */
+.catch-up-banner {
+    background-color: #fffde7;
+    /* Pale yellow */
+    border-radius: 10px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #856404;
+    border: 1px solid #f9e79f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    user-select: none;
+    font-weight: 500;
+    margin: 0 30px;
+    /* Ensure distance from month buttons */
+}
+
+.catch-up-banner:hover {
+    background-color: #fff3cd;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.catch-up-banner:active {
+    background-color: #ffeeb3;
+    transform: translateY(0);
 }
 
 .sidebar-footer {
@@ -543,6 +608,24 @@ body {
     vertical-align: super;
     font-weight: bold;
     margin-right: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.verse-num:hover {
+    background-color: #eee;
+    color: #2196F3;
+    text-decoration: underline;
+}
+
+.verse-highlight {
+    background-color: #fffde7;
+    /* Light yellow */
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
 }
 
 .reader-nav {

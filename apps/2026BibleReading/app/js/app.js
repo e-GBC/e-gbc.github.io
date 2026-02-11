@@ -62,6 +62,8 @@ async function initApp() {
         if (!showedGuide) {
             checkDailyInstallPrompt();
         }
+
+        checkVoicePackStatus();
     } catch (error) {
         console.error("Initialization Failed:", error);
     }
@@ -136,6 +138,11 @@ window.finishGuide = () => {
 
 // --- LANGUAGE HANDLING ---
 window.toggleLanguage = () => {
+    // [V43] Stop audio first to prevent sync issues
+    if (appState.isReading) {
+        stopAudioReading();
+    }
+
     appState.currentLang = appState.currentLang === 'zh' ? 'en' : 'zh';
     localStorage.setItem('bible_reading_lang', appState.currentLang);
 
@@ -174,6 +181,11 @@ window.switchView = (viewName) => {
     document.body.classList.remove('view-dashboard', 'view-reader');
     document.body.classList.add(`view-${viewName}`);
     window.scrollTo(0, 0);
+
+    // Stop audio if returning to dashboard
+    if (viewName === 'dashboard' && appState.isReading) {
+        stopAudioReading();
+    }
 };
 
 // --- DATA LOADING ---
@@ -306,36 +318,70 @@ function renderDashboard() {
         return;
     }
 
-    let html = plan.titles.length > 0 ? `<div class="titles-container"><h2>${plan.titles[0]}</h2></div>` : '';
+    // [V51] UI Layout: Flush header contains the Description (Title).
+    // Original book name display is restored to h3.
+    // In English mode, show the description but keep it concise.
+    const isEn = appState.currentLang === 'en';
     const grouped = {};
     plan.items.forEach(item => {
         if (!grouped[item.book]) grouped[item.book] = {
-            name: appState.currentLang === 'en' ? (item.book_en || item.book) : item.book,
+            name: isEn ? (item.book_en || item.book) : item.book,
             chapters: [],
             origBook: item.book
         };
         grouped[item.book].chapters.push(item.chapter);
     });
 
+    const groups = Object.values(grouped);
+    let html = '';
+
+    // Always render the flush header for Description
+    if (plan.titles.length > 0) {
+        let titleText = plan.titles[0];
+        // If it's English and the title is too long (like "Genesis Chapters 1-3"), 
+        // we keep it as provided in JSON but ensure CSS handles potential overflow.
+        html += `<div class="titles-container"><h2>${titleText}</h2></div>`;
+    }
+
     html += `<div class="chapters-area">`;
-    for (const group of Object.values(grouped)) {
+    groups.forEach((group) => {
         const { name, chapters, origBook } = group;
         const abbr = BOOK_MAP[origBook] || origBook;
         html += `<div class="book-group">`;
+
+        // Restore: Book name always as h3 below the blue header
         html += `<h3>${name}</h3>`;
+
         html += `<div class="chapter-grid">`;
         chapters.forEach(ch => {
             const isDone = appState.chapterProgress[`${abbr}_${ch}`];
             html += `<div class="chapter-circle ${isDone ? 'done' : ''}" onclick="toggleChapter('${origBook}', ${ch})">${ch}</div>`;
         });
         html += `</div></div>`;
-    }
+    });
     html += `</div>`;
 
     if (plan.items[0]) {
-        html += `<div style="margin-top: 20px;"><button class="btn-primary" onclick="loadScripture('${plan.items[0].book}', ${plan.items[0].chapter})">${t.startReading}</button></div>`;
+        html += `<div style="padding-bottom: 20px;"><button class="btn-primary" onclick="loadScripture('${plan.items[0].book}', ${plan.items[0].chapter})">📖 ${t.startReading}</button></div>`;
     }
     contentDiv.innerHTML = html;
+
+    // [V48] Update Month Navigation Labels to actual month names
+    const prevMonthBtn = document.querySelector('[onclick="changeMonth(-1)"]');
+    const nextMonthBtn = document.querySelector('[onclick="changeMonth(1)"]');
+    if (prevMonthBtn && nextMonthBtn) {
+        const currentDate = appState.currentDate;
+        const prevMonthDate = new Date(currentDate);
+        prevMonthDate.setMonth(currentDate.getMonth() - 1);
+        const nextMonthDate = new Date(currentDate);
+        nextMonthDate.setMonth(currentDate.getMonth() + 1);
+
+        const prevMonthLabel = t.months[prevMonthDate.getMonth()];
+        const nextMonthLabel = t.months[nextMonthDate.getMonth()];
+
+        prevMonthBtn.innerText = `◀ ${prevMonthLabel}`;
+        nextMonthBtn.innerText = `${nextMonthLabel} ▶`;
+    }
 
     renderCatchUp();
     updateStats();
@@ -346,7 +392,6 @@ function renderCatchUp() {
     if (!container) return;
 
     container.innerHTML = '';
-    container.classList.add('hidden');
     const start = new Date(YEAR_START);
     const end = getTodayGMT8();
     end.setDate(end.getDate() - 1);
@@ -369,9 +414,12 @@ function renderCatchUp() {
 
     if (earliestUnreadDate) {
         const t = translations[appState.currentLang];
-        const [msg, btn] = t.catchUpParams;
-        container.classList.remove('hidden');
-        container.innerHTML = `<div class="info-banner"><span>${msg} (${earliestUnreadDate})</span><button class="btn-primary" onclick="goToDate('${earliestUnreadDate}')">${btn}</button></div>`;
+        // [V47] Redesigned Catch-up Banner: full-width yellow area as button
+        container.innerHTML = `
+            <div class="catch-up-banner" onclick="goToDate('${earliestUnreadDate}')">
+                <span>⚡ ${t.catchUpParams[0]} (${earliestUnreadDate})</span>
+            </div>
+        `;
     }
 }
 
@@ -397,7 +445,10 @@ window.loadScripture = (bookNameZh, chapter) => {
     }
 
     const verses = bookData[chapter];
-    let html = Object.entries(verses).map(([vNum, text]) => `<p><span class="verse-num">${chapter}:${vNum}</span> ${text}</p>`).join('');
+    let html = Object.entries(verses).map(([vNum, text]) => {
+        const verseKey = `v-${abbr}-${chapter}-${vNum}`;
+        return `<p id="${verseKey}"><span class="verse-num" onclick="skipToVerse('${bookNameZh}', ${chapter}, ${vNum}, event)">${chapter}:${vNum}</span> <span class="verse-text">${text}</span></p>`;
+    }).join('');
     document.querySelector('.reader-content').innerHTML = html;
     document.querySelector('.chapter-title').textContent = displayName;
 
@@ -405,6 +456,7 @@ window.loadScripture = (bookNameZh, chapter) => {
     appState.currentChapter = chapter;
     renderReaderNav(bookNameZh, chapter);
     switchView('reader');
+    updateAudioBtn();
 };
 
 function renderReaderNav(currentBookZh, currentChapter) {
@@ -701,13 +753,21 @@ window.toggleTools = () => {
 
     const isHidden = sheet.classList.contains('hidden');
     if (isHidden) {
-        overlay.classList.remove('hidden');
-        sheet.classList.remove('hidden');
-        document.body.style.overflow = 'hidden'; // Prevent background scroll
+        openTools();
     } else {
         overlay.classList.add('hidden');
         sheet.classList.add('hidden');
         document.body.style.overflow = '';
+    }
+};
+
+window.openTools = () => {
+    const overlay = document.getElementById('tools-overlay');
+    const sheet = document.getElementById('tools-sheet');
+    if (overlay && sheet) {
+        overlay.classList.remove('hidden');
+        sheet.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
     }
 };
 
@@ -757,6 +817,379 @@ function showToast(message) {
     }, 4000);
 }
 
+// --- AUDIO READING (AI VOICE) ---
+appState.isReading = false;
+let audioTimer = null;
+let ttsEngine = null;
+let ttsModule = null;
+let audioCtx = null;
+let audioSource = null;
+let isTtsInitializing = false;
+let aiVoiceFailedPermanently = localStorage.getItem('bible_tts_skip_ai') === 'true';
+
+async function initTtsEngine() {
+    if (ttsEngine) return true;
+    if (aiVoiceFailedPermanently) return false;
+    if (isTtsInitializing) return false;
+    isTtsInitializing = true;
+
+    // --- [CHECK CODE: BIBLE-V47-UIUX-REFINEMENT] ---
+    console.log('[TTS-INIT] Starting initialization. Check Code: BIBLE-V47-UIUX-REFINEMENT');
+    updateAudioBtn(false, true); // Loading state
+    showToast(appState.currentLang === 'en' ? "Initializing AI Voice..." : "正在啟動 AI 語音引擎...");
+
+    try {
+        // Load Transformers.js dynamically
+        console.log('[TTS-INIT] Loading Transformers.js from CDN...');
+        const { pipeline, env } = await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2');
+
+        // Configure Transformers.js environment
+        env.allowLocalModels = false;
+        env.useCustomCache = true;
+
+        console.log('[TTS-INIT] Loading pipeline (text-to-speech: Xenova/mms-tts-zho)...');
+        ttsEngine = await pipeline('text-to-speech', 'Xenova/mms-tts-zho', {
+            progress_callback: (p) => {
+                if (p.status === 'progress') {
+                    const percent = Math.round((p.loaded / (p.total || 50000000)) * 100);
+                    showToast(appState.currentLang === 'zh' ? `正在啟動 AI 讀經... ${percent}%` : `Loading AI Voice... ${percent}%`);
+                }
+            }
+        });
+
+        console.log('Transformers.js TTS Engine initialized successfully');
+        showToast(appState.currentLang === 'en' ? "AI Voice Ready" : "語音引擎啟動完成");
+        isTtsInitializing = false;
+        return true;
+    } catch (err) {
+        if (err.message.includes('401') || err.message.includes('Unauthorized')) {
+            aiVoiceFailedPermanently = true;
+            localStorage.setItem('bible_tts_skip_ai', 'true');
+            console.warn('[TTS-INIT] AI Voice blocked (401). Fallback saved to storage to avoid future errors.');
+        } else {
+            console.error('Transformers.js Initialization Error:', err);
+        }
+        showToast(appState.currentLang === 'en' ? "Using High-Quality System Voice" : "切換至高品質系統語音...");
+        isTtsInitializing = false;
+        return false;
+    }
+}
+
+function playAudioBuffer(samples, sampleRate, onEnd) {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    const buffer = audioCtx.createBuffer(1, samples.length, sampleRate);
+    buffer.getChannelData(0).set(samples);
+
+    if (audioSource) {
+        try { audioSource.stop(); } catch (e) { }
+    }
+
+    audioSource = audioCtx.createBufferSource();
+    audioSource.buffer = buffer;
+
+    // [V36] EQ: Bass Boost (Low Shelf Filter) for richer voice
+    const bassBoost = audioCtx.createBiquadFilter();
+    bassBoost.type = 'lowshelf';
+    bassBoost.frequency.value = 200; // Frequencies below 200Hz
+    bassBoost.gain.value = 6;       // 6dB boost
+
+    audioSource.connect(bassBoost);
+    bassBoost.connect(audioCtx.destination);
+
+    audioSource.onended = onEnd;
+    audioSource.start();
+}
+
+window.toggleAudioReading = async () => {
+    console.log('[USER-ACTION] Toggle Audio Reading. Check Code: BIBLE-V47-UIUX-REFINEMENT');
+    if (appState.isReading) {
+        stopAudioReading();
+    } else {
+        appState.isReading = true;
+        updateAudioBtn();
+        startReadingCurrentChapter();
+    }
+};
+
+
+window.checkVoicePackStatus = async () => {
+    const btn = document.getElementById('tool-download-voice');
+    if (!btn) return;
+    // [V35] Default to hidden because we use System/Transformers logic
+    btn.style.display = 'none';
+};
+
+window.downloadVoicePack = async () => {
+    const isZh = appState.currentLang === 'zh';
+    showToast(isZh ? "AI 語音功能已優化，無需額外下載。" : "AI Voice is optimized, no extra download needed.");
+};
+
+function stopAudioReading() {
+    appState.isReading = false;
+
+    // Stop Web Speech API
+    window.speechSynthesis.cancel();
+
+    // Stop Sherpa-ONNX Audio
+    if (audioSource) {
+        try { audioSource.stop(); } catch (e) { }
+        audioSource = null;
+    }
+
+    if (audioTimer) clearTimeout(audioTimer);
+
+    // [V43] Clear Any Verse Highlights
+    document.querySelectorAll('.verse-highlight').forEach(el => el.classList.remove('verse-highlight'));
+
+    updateAudioBtn();
+}
+
+function updateAudioBtn(isWaiting = false, isLoading = false) {
+    const btn = document.getElementById('btn-audio-reading');
+    if (!btn) return;
+    const t = translations[appState.currentLang];
+
+    if (isLoading) {
+        btn.textContent = '...';
+        btn.style.background = '#dfe6e9';
+    } else if (isWaiting) {
+        btn.textContent = t.audioWait;
+        btn.style.background = '#ffeaa7';
+    } else if (appState.isReading) {
+        btn.textContent = t.audioStop;
+        btn.style.background = '#ff7675';
+        btn.style.color = 'white';
+    } else {
+        btn.textContent = t.audioPlay;
+        btn.style.background = '#f0f0f0';
+        btn.style.color = '';
+    }
+}
+
+async function startReadingCurrentChapter() {
+    if (!appState.isReading) return;
+
+    // 1. Prepare Content
+    const isEn = appState.currentLang === 'en';
+    const book = appState.currentBook;
+    const chapter = appState.currentChapter;
+    const abbr = BOOK_MAP[book];
+
+    let bookData;
+    let displayName;
+    if (isEn) {
+        const entry = appState.readingPlan.find(p => p.book === book);
+        const bookNameEn = entry ? entry.book_en : book;
+        bookData = appState.parsedBibleEn[bookNameEn];
+        displayName = `${bookNameEn} Chapter ${chapter}`;
+    } else {
+        bookData = appState.parsedBibleZh[abbr];
+        displayName = `${book} 第 ${chapter} 章`;
+    }
+
+    if (!bookData || !bookData[chapter]) {
+        stopAudioReading();
+        return;
+    }
+
+    const verses = bookData[chapter];
+    const cleanVerses = Object.values(verses).join(' ');
+    const fullTextToRead = isEn ? `${displayName}. ${cleanVerses}` : `${displayName}。 ${cleanVerses}`;
+    // console.log(`[TTS-PREPARE] Text length: ${fullTextToRead.length}, Lang: ${appState.currentLang}`);
+
+    // 2. Use Sherpa-ONNX for Chinese voice, Fallback to Web Speech for English
+    if (!isEn) {
+        const ok = await initTtsEngine();
+        if (!ok) {
+            // Fallback to Web Speech API if Sherpa fails
+            readWithWebSpeech(fullTextToRead, 'zh-TW');
+            return;
+        }
+
+        // Generate and Play
+        try {
+            // console.log('[TTS-INIT] Generating speech with Transformers.js...');
+            const output = await ttsEngine(fullTextToRead, {
+                length_scale: 0.8,     // [V46] Tuned for faster natural flow
+                noise_scale: 0.66,     // [V46] Tuned for better resonance
+                noise_scale_w: 0.95   // [V46] Tuned for natural steady rhythm
+            });
+
+            // output.audio is a Float32Array, output.sampling_rate is the rate
+            playAudioBuffer(output.audio, output.sampling_rate, () => {
+                handleReadingEnd();
+            });
+        } catch (err) {
+            console.error('TTS Generation error:', err);
+            stopAudioReading();
+        }
+    } else {
+        readWithWebSpeech(fullTextToRead, 'en-US');
+    }
+}
+
+let speechChunks = [];
+let voiceQueueIndex = 0;
+let lastMatchedVerseIdx = 0; // [V44] Prevent jumping back
+let currentUtterance = null;
+
+function readWithWebSpeech(text, lang) {
+    // [V43] Split by more punctuation
+    speechChunks = text.split(/([.。\n!！?？;；,，:：])/).reduce((acc, part, i) => {
+        if (i % 2 === 0) acc.push(part);
+        else if (acc.length > 0) acc[acc.length - 1] += part;
+        return acc;
+    }, []).filter(s => s.trim().length > 0);
+
+    voiceQueueIndex = 0;
+    lastMatchedVerseIdx = 0; // Reset tracking
+    window.speechSynthesis.cancel();
+    setTimeout(() => playNextChunk(lang), 300);
+}
+
+function playNextChunk(lang) {
+    if (!appState.isReading || voiceQueueIndex >= speechChunks.length) {
+        handleReadingEnd();
+        return;
+    }
+
+    const chunkText = speechChunks[voiceQueueIndex];
+    currentUtterance = new SpeechSynthesisUtterance(chunkText);
+    currentUtterance.lang = lang === 'en-US' ? 'en' : lang;
+
+    const voices = window.speechSynthesis.getVoices();
+    let selectedVoice = voices.find(v => v.lang.startsWith(lang.split('-')[0]) && v.name.includes('Google')) ||
+        voices.find(v => v.lang.startsWith(lang.split('-')[0]) && v.name.includes('Microsoft')) ||
+        voices.find(v => v.lang.startsWith(lang.split('-')[0]));
+
+    if (selectedVoice) currentUtterance.voice = selectedVoice;
+
+    currentUtterance.rate = 0.85;
+    currentUtterance.pitch = 0.8;
+
+    currentUtterance.onend = () => {
+        voiceQueueIndex++;
+        currentUtterance = null;
+        if (appState.isReading) playNextChunk(lang);
+    };
+
+    currentUtterance.onerror = (e) => {
+        if (e.error === 'interrupted') return;
+        console.error('[TTS-FALLBACK] Chunk error:', e);
+        stopAudioReading();
+    };
+
+    window.speechSynthesis.speak(currentUtterance);
+    highlightVerseByText(chunkText);
+}
+
+function highlightVerseByText(text) {
+    const reader = document.querySelector('.reader-content');
+    if (!reader) return;
+
+    const cleanChunk = text.trim().replace(/[.,!?:;，。！？：；\s]/g, '');
+    if (cleanChunk.length < 2) return;
+
+    const verseElements = Array.from(reader.querySelectorAll('p'));
+
+    // [V44] Search forward from the last matched verse to prevent jumping backwards
+    let matchIdx = -1;
+    for (let i = lastMatchedVerseIdx; i < verseElements.length; i++) {
+        const verseText = (verseElements[i].querySelector('.verse-text')?.textContent || '').replace(/[.,!?:;，。！？：；\s]/g, '');
+        if (verseText.includes(cleanChunk.substring(0, 15)) || cleanChunk.includes(verseText.substring(0, 15))) {
+            matchIdx = i;
+            break;
+        }
+    }
+
+    if (matchIdx !== -1) {
+        lastMatchedVerseIdx = matchIdx; // Update progress
+        const match = verseElements[matchIdx];
+        reader.querySelectorAll('.verse-highlight').forEach(el => el.classList.remove('verse-highlight'));
+        match.classList.add('verse-highlight');
+        match.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+window.skipToVerse = (book, chapter, vNum, event) => {
+    if (event) event.stopPropagation();
+    console.log(`[USER-ACTION] Skip to Verse: ${book} ${chapter}:${vNum}`);
+
+    if (!appState.isReading) {
+        appState.isReading = true;
+        updateAudioBtn();
+    }
+
+    stopSpeechEngines(); // Custom helper to stop all
+
+    const isEn = appState.currentLang === 'en';
+    const abbr = BOOK_MAP[book];
+    const bookData = isEn ? appState.parsedBibleEn[appState.readingPlan.find(p => p.book === book).book_en] : appState.parsedBibleZh[abbr];
+    const verses = bookData[chapter];
+
+    // Get text starting from this verse
+    const remainingVerses = Object.entries(verses)
+        .filter(([num]) => parseInt(num) >= vNum)
+        .map(([_, text]) => text)
+        .join(' ');
+
+    const fullText = (vNum === 1) ?
+        (isEn ? `${appState.currentBook} Chapter ${chapter}. ${remainingVerses}` : `${book} 第 ${chapter} 章。${remainingVerses}`) :
+        remainingVerses;
+
+    if (isEn) {
+        readWithWebSpeech(fullText, 'en-US');
+    } else {
+        // AI Voice skip (re-init if needed or just use fallback for simplicity of 'skip')
+        // For now, let's use Web Speech for instant skip feedback, or refactor startReading if needed.
+        readWithWebSpeech(fullText, 'zh-TW');
+    }
+};
+
+function stopSpeechEngines() {
+    window.speechSynthesis.cancel();
+    if (audioSource) { try { audioSource.stop(); } catch (e) { } audioSource = null; }
+    if (audioTimer) clearTimeout(audioTimer);
+}
+
+function handleReadingEnd() {
+    if (!appState.isReading) return;
+    const next = findNextChapterToday();
+    if (next) {
+        updateAudioBtn(true);
+        audioTimer = setTimeout(() => {
+            finishAndNext(appState.currentBook, appState.currentChapter, next.book, next.chapter);
+            setTimeout(() => startReadingCurrentChapter(), 500);
+        }, 5000);
+    } else {
+        // [V42] Auto-finish today's progress after 5s if last chapter
+        updateAudioBtn(true);
+        showToast(appState.currentLang === 'en' ? "Daily plan finished! Completing..." : "今日進度已讀完，即將自動完成...");
+        audioTimer = setTimeout(() => {
+            appState.chapterProgress[`${BOOK_MAP[appState.currentBook]}_${appState.currentChapter}`] = true;
+            saveProgress();
+            renderDashboard();
+            stopAudioReading();
+            alert(translations[appState.currentLang].congratsBody);
+            switchView('dashboard');
+        }, 5000);
+    }
+}
+
+function findNextChapterToday() {
+    const dateStr = getDateKey(appState.currentDate);
+    const plan = getPlanForDate(dateStr);
+    if (!plan) return null;
+
+    const currentIndex = plan.items.findIndex(i => i.book === appState.currentBook && i.chapter === appState.currentChapter);
+    if (currentIndex >= 0 && currentIndex < plan.items.length - 1) {
+        return plan.items[currentIndex + 1];
+    }
+    return null;
+}
+
 window.createShortcut = () => {
     alert("請點擊瀏覽器選單中的『安裝應用程式』或『加入主畫面』來建立桌面捷徑。");
 };
+

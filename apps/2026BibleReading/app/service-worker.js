@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bible-reading-v1.0.15';
+const CACHE_NAME = 'bible-reading-v1.1.1';
 const ASSETS = [
     './',
     './index.html',
@@ -11,42 +11,41 @@ const ASSETS = [
     './js/i18n.js',
     './js/summary.js',
     './js/pwa-handler.js',
-    './manifest.json',
-    './icons/icon-192x192.png',
-    './icons/icon-512x512.png',
-    './ref/tut01_tool.png',
-    '../data/reading_plan.json',
-    '../data/summary_texts.json',
     '../data/bible.js',
     '../data/bible_en.js'
 ];
 
-self.addEventListener('install', (event) => {
+const EXTERNAL_WHITELIST = [
+    'huggingface.co',
+    'cdn.jsdelivr.net',
+    'huggingface.cloud'
+];
+
+self.addEventListener('install', event => {
     self.skipWaiting();
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS);
-        })
+        caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
     );
 });
 
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
     event.waitUntil(
-        Promise.all([
-            self.clients.claim(),
-            caches.keys().then((cacheNames) => {
-                return Promise.all(
-                    cacheNames.filter((name) => name !== CACHE_NAME)
-                        .map((name) => caches.delete(name))
-                );
-            })
-        ])
+        caches.keys().then(keys => Promise.all(
+            keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+        ))
     );
 });
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
+    const url = new URL(event.request.url);
+
+    // Skip external AI assets from caching to avoid CORS/401 complexities
+    if (EXTERNAL_WHITELIST.some(domain => url.hostname.includes(domain))) {
+        return; // Let it go to network directly
+    }
+
     event.respondWith(
-        caches.match(event.request).then((response) => {
+        caches.match(event.request).then(response => {
             return response || fetch(event.request);
         })
     );

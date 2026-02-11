@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "sherpa-onnx": "^1.12.24"
+  }
+}

@@ -14,7 +14,7 @@
     <script src="../data/bible.js"></script>
     <script src="../data/bible_en.js"></script>
     <script src="js/i18n.js"></script>
-    <script src="js/app.js" defer></script>
+    <script src="js/app.js?v=1.1.1" defer></script>
     <script src="js/pwa-handler.js" defer></script>
 
     <script>
@@ -23,19 +23,7 @@
                 navigator.serviceWorker.register('./service-worker.js')
                     .then(reg => {
                         console.log('SW Registered');
-                        // Periodically check for updates
-                        setInterval(() => { reg.update(); }, 60 * 60 * 1000); // Check every hour
-                    })
-                    .catch(err => console.log('SW Error:', err));
-            });
-
-            // Handle automatic reload when the new service worker takes control
-            let refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (!refreshing) {
-                    refreshing = true;
-                    window.location.reload();
-                }
+                    });
             });
         }
     </script>
@@ -45,35 +33,37 @@
     <div id="app">
         <!-- Left Panel: Progress & Dashboard -->
         <aside class="sidebar">
-            <header class="app-header">
-                <h1 data-i18n="appTitle">每日讀經</h1>
+            <header class="app-header" style="position: relative; padding-bottom: 5px;">
+                <h1 data-i18n="appTitle" style="margin-bottom: 8px;">每日讀經</h1>
                 <button id="lang-toggle-dashboard" class="btn-text" onclick="toggleLanguage()"
-                    style="font-size: 0.9rem; position: absolute; right: 15px; top: 15px;">English</button>
+                    style="font-size: 0.9rem; position: absolute; right: 15px; top: 15px; color: #888;">English</button>
 
                 <div class="date-controls">
                     <button class="btn-icon-small" onclick="changeDay(-1)">◀</button>
-                    <span class="date-display">載入中...</span>
+                    <span class="date-display" style="font-size: 1.5rem;">載入中...</span>
                     <button class="btn-icon-small" onclick="changeDay(1)">▶</button>
                 </div>
 
-                <div style="margin-top: 5px;">
+                <div style="margin-top: 5px; height: 24px;">
                     <button id="btn-return-today" class="btn-text hidden" onclick="goToToday()" data-i18n="navBack">↺
                         返回今日</button>
                 </div>
-
-                <div class="month-controls">
-                    <button class="btn-text" onclick="changeMonth(-1)" data-i18n="prevMonth">◀ 上個月</button>
-                    <button class="btn-text" onclick="changeMonth(1)" data-i18n="nextMonth">下個月 ▶</button>
-                </div>
             </header>
 
-            <div id="catch-up-container" class="hidden"></div>
-
             <div class="dashboard-content">
-                <div class="daily-card" id="today-card">
+                <div class="daily-card" id="today-card" style="margin-bottom: 15px;">
                     <div class="card-content">
                         <h2>載入中...</h2>
                     </div>
+                </div>
+
+                <div class="month-controls"
+                    style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 5px; margin-bottom: 25px;">
+                    <button class="btn-text" onclick="changeMonth(-1)" style="font-size: 1.1rem; flex: 0 0 auto;">◀
+                        上個月</button>
+                    <div id="catch-up-container" style="flex: 1; min-width: 0;"></div>
+                    <button class="btn-text" onclick="changeMonth(1)" style="font-size: 1.1rem; flex: 0 0 auto;">下個月
+                        ▶</button>
                 </div>
 
                 <div class="monthly-progress">
@@ -143,6 +133,13 @@
                         <div class="tool-desc" data-i18n="completeAllDesc">完成今天之前的所有進度</div>
                     </div>
                 </button>
+                <button class="tool-item" id="tool-download-voice" type="button" onclick="downloadVoicePack()">
+                    <span class="tool-icon">🎧</span>
+                    <div class="tool-text">
+                        <div class="tool-name" data-i18n="downloadVoiceBtn">下載語音包</div>
+                        <div class="tool-desc" data-i18n="downloadVoiceDesc">約 70MB，由 AI 語言模型為您讀經</div>
+                    </div>
+                </button>
                 <button class="tool-item" type="button" onclick="createShortcut()">
                     <span class="tool-icon">📱</span>
                     <div class="tool-text">
@@ -166,9 +163,26 @@
                 </button>
             </div>
             <div class="sheet-footer" style="padding: 10px 20px; text-align: center; border-top: 1px solid #f0f0f0;">
-                <p id="app-version" style="font-size: 10px; color: #bbb; margin: 0;">2026GBCBibleReading v.1.0.15</p>
+                <p id="app-version" style="font-size: 10px; color: #bbb; margin: 0; cursor: pointer;"
+                    onclick="clearAppCache()">2026GBCBibleReading v.1.1.1 (點此重置快取)</p>
             </div>
         </div>
+
+        <script>
+            function clearAppCache() {
+                console.log('[USER-ACTION] Clear cache requested.');
+                if (confirm('確定要清除快取的語音包並重新下載嗎？')) {
+                    caches.keys().then(names => {
+                        for (let name of names) {
+                            console.log('[SW] Deleting cache:', name);
+                            caches.delete(name);
+                        }
+                        console.log('[SW] Cache cleared. Force reloading...');
+                        location.reload(true);
+                    });
+                }
+            }
+        </script>
 
         <!-- Daily Install Prompt Banner -->
         <div id="install-prompt-banner" class="install-banner hidden">
@@ -277,6 +291,9 @@
                 <button class="btn-text mobile-only" onclick="switchView('dashboard')">←</button>
                 <div class="chapter-title" data-i18n="readerTitleDefault">章節標題</div>
                 <div style="display: flex; gap: 10px; align-items: center;">
+                    <button class="btn-text" id="btn-audio-reading" onclick="toggleAudioReading()"
+                        style="font-size: 0.9rem; background: #f0f0f0; border-radius: 20px; padding: 4px 12px;"
+                        data-i18n="audioPlay">🎙️ 語音讀經</button>
                     <button class="btn-text" onclick="toggleLanguage()" id="lang-toggle-reader"
                         style="font-size: 0.9rem;">English</button>
                     <button class="btn-icon" onclick="toggleFontSize()">Aa</button>
