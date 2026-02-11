@@ -35,6 +35,14 @@ function initPWALogic() {
         e.preventDefault();
         deferredPrompt = e;
     });
+
+    // 3. Handle URL param for auto-install trigger (from Guide)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('install') === 'true') {
+        setTimeout(() => {
+            window.createShortcut();
+        }, 800);
+    }
 }
 
 /**

@@ -414,10 +414,10 @@ function renderCatchUp() {
 
     if (earliestUnreadDate) {
         const t = translations[appState.currentLang];
-        // [V47] Redesigned Catch-up Banner: full-width yellow area as button
+        // [V1.1.5] Improved centering for multi-line on mobile
         container.innerHTML = `
             <div class="catch-up-banner" onclick="goToDate('${earliestUnreadDate}')">
-                <span>⚡ ${t.catchUpParams[0]} (${earliestUnreadDate})</span>
+                <span style="text-align: center; width: 100%;">⚡ ${t.catchUpParams[0]}<br>(${earliestUnreadDate})</span>
             </div>
         `;
     }
@@ -439,17 +439,15 @@ window.loadScripture = (bookNameZh, chapter) => {
         displayName = `${bookNameZh} 第 ${chapter} 章`;
     }
 
-    if (!bookData || !bookData[chapter]) {
-        document.querySelector('.reader-content').innerHTML = `<p>經文載入失敗 (${displayName})</p>`;
-        return;
-    }
-
     const verses = bookData[chapter];
     let html = Object.entries(verses).map(([vNum, text]) => {
         const verseKey = `v-${abbr}-${chapter}-${vNum}`;
         return `<p id="${verseKey}"><span class="verse-num" onclick="skipToVerse('${bookNameZh}', ${chapter}, ${vNum}, event)">${chapter}:${vNum}</span> <span class="verse-text">${text}</span></p>`;
     }).join('');
-    document.querySelector('.reader-content').innerHTML = html;
+    document.querySelector('.reader-content').innerHTML = `
+        <div class="reader-chapter-title-secondary">${displayName}</div>
+        ${html}
+    `;
     document.querySelector('.chapter-title').textContent = displayName;
 
     appState.currentBook = bookNameZh;
@@ -548,7 +546,7 @@ function updateStats() {
     const monthPercent = monthTotal > 0 ? (monthDone / monthTotal) * 100 : 0;
     document.querySelector('#monthly-bar').style.width = `${Math.round(monthPercent)}%`;
     document.querySelector('.monthly-text').textContent =
-        `${t.months[month]}: ${t.monthFinish || "Month Completion"} ${monthDone} / ${monthTotal} ${t.chapterUnit} ( ${Math.round(monthPercent)}% )`;
+        `${t.months[month]}完成度 ${monthDone} / ${monthTotal} ${t.chapterUnit} ( ${Math.round(monthPercent)}% )`;
 
     // Update Button Icon & Text
     const monthBtn = document.getElementById('month-complete-btn');
@@ -1011,9 +1009,9 @@ async function startReadingCurrentChapter() {
         try {
             // console.log('[TTS-INIT] Generating speech with Transformers.js...');
             const output = await ttsEngine(fullTextToRead, {
-                length_scale: 0.8,     // [V46] Tuned for faster natural flow
-                noise_scale: 0.66,     // [V46] Tuned for better resonance
-                noise_scale_w: 0.95   // [V46] Tuned for natural steady rhythm
+                length_scale: 0.5,     // Updated: Very fast flow
+                noise_scale: 0.75,     // Updated: Emotional variance
+                noise_scale_w: 1.20    // Updated: Strong rhythm and breathing
             });
 
             // output.audio is a Float32Array, output.sampling_rate is the rate
@@ -1065,8 +1063,14 @@ function playNextChunk(lang) {
 
     if (selectedVoice) currentUtterance.voice = selectedVoice;
 
-    currentUtterance.rate = 0.85;
-    currentUtterance.pitch = 0.8;
+    // Chinese AI parameters requested by user (applied to fallback as well)
+    if (lang === 'zh-TW') {
+        currentUtterance.rate = 0.9;
+        currentUtterance.pitch = 0.85;
+    } else {
+        currentUtterance.rate = 0.85;
+        currentUtterance.pitch = 0.8;
+    }
 
     currentUtterance.onend = () => {
         voiceQueueIndex++;
