@@ -189,7 +189,7 @@ function applyTheme() {
         themeLink.rel = 'stylesheet';
         document.head.appendChild(themeLink);
     }
-    themeLink.href = `css/theme-${isDark ? 'dark' : 'light'}.css?v=1.1.18`;
+    themeLink.href = `css/theme-${isDark ? 'dark' : 'light'}.css?v=1.1.19`;
 }
 
 function applyFontSize() {

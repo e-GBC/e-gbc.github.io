@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gbc-root-v1';
+const CACHE_NAME = 'gbc-root-v1.1.19';
 const ASSETS = [
     './',
     './index.html',
