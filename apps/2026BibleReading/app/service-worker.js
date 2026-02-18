@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bible-reading-v1.1.6';
+const CACHE_NAME = 'bible-reading-v1.1.16';
 const ASSETS = [
     './',
     './index.html',
@@ -7,6 +7,8 @@ const ASSETS = [
     './css/style.css',
     './css/guide.css',
     './css/summary.css',
+    './css/theme-light.css',
+    './css/theme-dark.css',
     './js/app.js',
     './js/i18n.js',
     './js/summary.js',
@@ -14,6 +16,7 @@ const ASSETS = [
     '../data/bible.js',
     '../data/bible_en.js'
 ];
+
 
 const EXTERNAL_WHITELIST = [
     'huggingface.co',

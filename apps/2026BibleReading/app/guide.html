@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>使用說明書 - 懷恩堂 2026 聖經讀經</title>
-    <link rel="stylesheet" href="css/guide.css">
+    <link rel="stylesheet" href="css/guide.css?v=1.1.12">
+    <link id="theme-link" rel="stylesheet" href="css/theme-light.css?v=1.1.12">
     <style>
         .btn-action {
             background: var(--primary-color);
@@ -181,6 +182,32 @@
             </div>
         </section>
 
+        <!-- Share Section -->
+        <section class="guide-card share-card" style="text-align: center; border-left: none;">
+            <h2 lang="zh">將這個APP分享給更多人，一起來讀經吧！</h2>
+            <h2 lang="en">Share this APP and read the Bible together!</h2>
+
+            <div style="margin: 20px 0;">
+                <img src="../ref/e-GBC-qrcode.png"
+                    style="width: 200px; border: 10px solid white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            </div>
+
+            <div class="share-box">
+                <div lang="zh">
+                    <p style="font-size: 16px; margin-bottom: 15px;">邀請您進行一年讀經一遍的計畫！</p>
+                    <p style="font-size: 16px; margin-bottom: 15px;">https://e-gbc.github.io/</p>
+                </div>
+                <div lang="en">
+                    <p style="font-size: 16px; margin-bottom: 15px;">Invite you to join Bible reading plan!</p>
+                    <p style="font-size: 16px; margin-bottom: 15px;">https://e-gbc.github.io/</p>
+                </div>
+                <button class="btn-action" style="margin: 0; max-width: none;" onclick="copyShareText()">
+                    <span lang="zh">點擊複製以下文字至剪貼簿</span>
+                    <span lang="en">Click to copy text to clipboard</span>
+                </button>
+            </div>
+        </section>
+
         <footer class="guide-footer">
             <div lang="zh">
                 <p>願上帝祝福您！</p>
@@ -192,6 +219,16 @@
     </main>
 
     <script>
+        function copyShareText() {
+            const isEn = document.body.classList.contains('lang-en');
+            const zhText = "邀請您進行一年讀經一遍的計畫！\nhttps://e-gbc.github.io/";
+            const enText = "Invite you to join Bible reading plan!\nhttps://e-gbc.github.io/";
+            const text = isEn ? enText : zhText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert(document.body.classList.contains('lang-en') ? "Copied!" : "已複製到剪貼簿");
+            });
+        }
+
         function toggleLang() {
             document.body.classList.toggle('lang-en');
             const newLang = document.body.classList.contains('lang-en') ? 'en' : 'zh';
@@ -202,6 +239,15 @@
         if (savedLang === 'en') {
             document.body.classList.add('lang-en');
         }
+
+        const savedTheme = localStorage.getItem('bible_reading_theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+            const themeLink = document.getElementById('theme-link');
+            if (themeLink) themeLink.href = 'css/theme-dark.css?v=1.1.12';
+        }
+        document.body.classList.add('guide-page-body');
+
     </script>
 </body>
 

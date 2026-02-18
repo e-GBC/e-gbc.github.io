@@ -438,3 +438,67 @@ body {
 .percentage-big.updating {
     animation: countUp 0.1s ease-out;
 }
+
+/* --- Dark Mode for Summary --- */
+body.dark-theme,
+body.dark-theme html {
+    background-color: #121212 !important;
+}
+
+body.dark-theme .summary-container {
+    background-color: #121212;
+}
+
+
+body.dark-theme .summary-header {
+    background: #1e1e1e;
+    border-bottom: 1px solid #333;
+}
+
+body.dark-theme .current-month-label {
+    color: #eee;
+}
+
+body.dark-theme .back-link {
+    color: #aaa;
+}
+
+body.dark-theme .month-arrow {
+    background: #252525;
+}
+
+body.dark-theme .month-arrow:hover {
+    background: #333;
+}
+
+body.dark-theme .daily-row {
+    background: #1e1e1e;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-theme .date-col {
+    color: #3d5afe;
+    border-right-color: #333;
+}
+
+body.dark-theme .chapter-box {
+    background: #252525;
+    color: #ccc;
+    border-color: #333;
+}
+
+body.dark-theme .chapter-box.done {
+    background: #1a237e;
+    color: #90caf9;
+    border-color: #283593;
+}
+
+body.dark-theme .chk-icon {
+    background: #333;
+    border-color: #444;
+}
+
+body.dark-theme .chapter-box.done .chk-icon {
+    background: #3d5afe;
+    border-color: #3d5afe;
+}

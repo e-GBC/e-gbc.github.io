@@ -10,7 +10,8 @@ window.appState = {
     parsedBibleEn: {},
     chapterProgress: {},
     currentLang: localStorage.getItem('bible_reading_lang') || 'zh',
-    fontSizeIndex: 2,
+    theme: localStorage.getItem('bible_reading_theme') || 'light',
+    fontSizeIndex: parseInt(localStorage.getItem('bible_reading_font_idx')) || 2,
     activeView: 'dashboard',
     currentBook: null,
     currentChapter: null
@@ -21,7 +22,7 @@ const appState = window.appState;
 // --- CONSTANTS ---
 const YEAR_START = new Date("2026-01-01T00:00:00+08:00");
 const YEAR_END = new Date("2026-12-31T23:59:59+08:00");
-const FONT_SIZES = [10, 12, 14, 16, 17, 18];
+const FONT_SIZES = [12, 14, 16, 17, 18, 20];
 
 const BOOK_MAP = {
     "創世記": "創", "出埃及記": "出", "利未記": "利", "民數記": "民", "申命記": "申",
@@ -50,6 +51,8 @@ async function initApp() {
         loadProgress();
         updateTranslations();
         applyLanguageStyle();
+        applyTheme(); // [V55] Apply dark mode
+        applyFontSize(); // [V55] Apply saved font size
         renderDashboard();
         switchView('dashboard');
 
@@ -160,7 +163,7 @@ function updateTranslations() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (t[key] && key !== 'catchUpParams') {
-            el.innerText = t[key];
+            el.innerHTML = t[key];
         }
     });
 
@@ -173,6 +176,26 @@ function updateTranslations() {
 
 function applyLanguageStyle() {
     document.body.classList.toggle('lang-en', appState.currentLang === 'en');
+}
+
+function applyTheme() {
+    const isDark = appState.theme === 'dark';
+    document.body.classList.toggle('dark-theme', isDark);
+
+    // [V1.1.13] Robust theme linking
+    let themeLink = document.getElementById('theme-link');
+    if (!themeLink) {
+        themeLink = document.createElement('link');
+        themeLink.id = 'theme-link';
+        themeLink.rel = 'stylesheet';
+        document.head.appendChild(themeLink);
+    }
+    themeLink.href = `css/theme-${isDark ? 'dark' : 'light'}.css?v=1.1.15`;
+}
+
+function applyFontSize() {
+    const style = document.getElementById('font-size-style') || document.head.appendChild(Object.assign(document.createElement('style'), { id: 'font-size-style' }));
+    style.innerHTML = `.reader-content p { font-size: ${FONT_SIZES[appState.fontSizeIndex]}pt !important; }`;
 }
 
 // --- VIEW MANAGER ---
@@ -220,6 +243,12 @@ function loadProgress() {
 function saveProgress() {
     localStorage.setItem('bible_reading_progress_v2', JSON.stringify(appState.chapterProgress));
     updateStats();
+}
+
+function saveSettings() {
+    localStorage.setItem('bible_reading_theme', appState.theme);
+    localStorage.setItem('bible_reading_font_idx', appState.fontSizeIndex);
+    localStorage.setItem('bible_reading_lang', appState.currentLang);
 }
 
 // --- CORE LOGIC ---
@@ -448,7 +477,8 @@ window.loadScripture = (bookNameZh, chapter) => {
         <div class="reader-chapter-title-secondary">${displayName}</div>
         ${html}
     `;
-    document.querySelector('.chapter-title').textContent = displayName;
+    // [V1.1.16] Header title remains static as "Bible Reading / 經文閱讀"
+    // document.querySelector('.chapter-title').textContent = displayName;
 
     appState.currentBook = bookNameZh;
     appState.currentChapter = chapter;
@@ -545,8 +575,11 @@ function updateStats() {
 
     const monthPercent = monthTotal > 0 ? (monthDone / monthTotal) * 100 : 0;
     document.querySelector('#monthly-bar').style.width = `${Math.round(monthPercent)}%`;
+
+    // [V1.1.13] Unified Progress Display
+    const progressText = appState.currentLang === 'en' ? "Progress" : "完成";
     document.querySelector('.monthly-text').textContent =
-        `${t.months[month]}完成度 ${monthDone} / ${monthTotal} ${t.chapterUnit} ( ${Math.round(monthPercent)}% )`;
+        `${t.months[month]} ${progressText} ${monthDone} / ${monthTotal} ${t.chapterUnit} ( ${Math.round(monthPercent)}% )`;
 
     // Update Button Icon & Text
     const monthBtn = document.getElementById('month-complete-btn');
@@ -707,7 +740,15 @@ window.completeMonth = () => {
 window.exportData = () => {
     const d = new Date();
     const fileName = `GBC2026_Progress_${d.getFullYear().toString().slice(-2)}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}.json`;
-    const blob = new Blob([JSON.stringify(appState.chapterProgress)], { type: 'application/json' });
+    const exportObj = {
+        progress: appState.chapterProgress,
+        settings: {
+            theme: appState.theme,
+            fontIdx: appState.fontSizeIndex,
+            lang: appState.currentLang
+        }
+    };
+    const blob = new Blob([JSON.stringify(exportObj)], { type: 'application/json' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = fileName;
@@ -724,7 +765,17 @@ window.importData = () => {
         const reader = new FileReader();
         reader.onload = event => {
             try {
-                appState.chapterProgress = JSON.parse(event.target.result);
+                const data = JSON.parse(event.target.result);
+                if (data.progress) {
+                    appState.chapterProgress = data.progress;
+                    if (data.settings) {
+                        if (data.settings.theme) localStorage.setItem('bible_reading_theme', data.settings.theme);
+                        if (data.settings.fontIdx !== undefined) localStorage.setItem('bible_reading_font_idx', data.settings.fontIdx);
+                        if (data.settings.lang) localStorage.setItem('bible_reading_lang', data.settings.lang);
+                    }
+                } else {
+                    appState.chapterProgress = data;
+                }
                 saveProgress();
                 alert(translations[appState.currentLang].importSuccess);
                 location.reload();
@@ -739,8 +790,8 @@ window.importData = () => {
 
 window.toggleFontSize = () => {
     appState.fontSizeIndex = (appState.fontSizeIndex + 1) % FONT_SIZES.length;
-    const style = document.getElementById('font-size-style') || document.head.appendChild(Object.assign(document.createElement('style'), { id: 'font-size-style' }));
-    style.innerHTML = `.reader-content p { font-size: ${FONT_SIZES[appState.fontSizeIndex]}pt !important; }`;
+    applyFontSize();
+    saveSettings();
 };
 
 // --- TOOL SHEET ---
@@ -751,6 +802,21 @@ window.toggleTools = () => {
 
     const isHidden = sheet.classList.contains('hidden');
     if (isHidden) {
+        // [V55] Conditional tool item visibility
+        const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+        const installBtn = document.getElementById('tool-install-app');
+        if (installBtn) installBtn.classList.toggle('hidden', isStandalone);
+
+        const todayStr = getDateKey(getTodayGMT8());
+        const hasUnreadPast = appState.readingPlan.some(p => {
+            if (p.date < todayStr && Array.isArray(p.chapters)) {
+                return p.chapters.some(ch => !appState.chapterProgress[`${BOOK_MAP[p.book]}_${ch}`]);
+            }
+            return false;
+        });
+        const completeBtn = document.getElementById('tool-complete-all');
+        if (completeBtn) completeBtn.classList.toggle('hidden', !hasUnreadPast);
+
         openTools();
     } else {
         overlay.classList.add('hidden');
@@ -1195,5 +1261,92 @@ function findNextChapterToday() {
 
 window.createShortcut = () => {
     alert("請點擊瀏覽器選單中的『安裝應用程式』或『加入主畫面』來建立桌面捷徑。");
+};
+
+// --- APPEARANCE SETTINGS ---
+window.showAppearanceSettings = () => {
+    appState.tempTheme = appState.theme;
+    appState.tempFontIdx = appState.fontSizeIndex;
+    appState.tempLang = appState.currentLang;
+
+    document.getElementById('theme-toggle').checked = appState.tempTheme === 'dark';
+    document.getElementById('lang-toggle-setting').checked = appState.tempLang === 'en';
+    applyTheme(); // Ensure initial state is correct
+    updateAppearancePreview();
+
+    document.getElementById('appearance-overlay').classList.remove('hidden');
+    document.getElementById('tools-sheet').classList.add('hidden');
+    document.getElementById('tools-overlay').classList.add('hidden');
+};
+
+window.closeAppearanceSettings = () => {
+    // Restore original theme if we are closing without saving
+    appState.theme = localStorage.getItem('bible_reading_theme') || 'light';
+    applyTheme();
+
+    document.getElementById('appearance-overlay').classList.add('hidden');
+    document.body.style.overflow = '';
+};
+
+window.previewTheme = () => {
+    appState.theme = document.getElementById('theme-toggle').checked ? 'dark' : 'light';
+    appState.tempTheme = appState.theme; // Keep temp in sync if needed
+    applyTheme();
+};
+
+window.previewLang = () => {
+    appState.tempLang = document.getElementById('lang-toggle-setting').checked ? 'en' : 'zh';
+};
+
+window.changeFontSizeLevel = (offset) => {
+    const newIdx = appState.tempFontIdx + offset;
+    if (newIdx >= 0 && newIdx < FONT_SIZES.length) {
+        appState.tempFontIdx = newIdx;
+        updateAppearancePreview();
+    }
+};
+
+function updateAppearancePreview() {
+    const preview = document.getElementById('font-size-preview');
+    if (preview) {
+        preview.style.fontSize = `${FONT_SIZES[appState.tempFontIdx]}pt`;
+    }
+}
+
+window.resetAppearance = () => {
+    appState.theme = 'light';
+    appState.tempTheme = 'light';
+    appState.tempFontIdx = 2;
+    appState.tempLang = 'zh';
+
+    document.getElementById('theme-toggle').checked = false;
+    document.getElementById('lang-toggle-setting').checked = false;
+    applyTheme();
+    updateAppearancePreview();
+};
+
+window.saveAppearance = () => {
+    appState.theme = appState.tempTheme;
+    appState.fontSizeIndex = appState.tempFontIdx;
+
+    const langChanged = appState.currentLang !== appState.tempLang;
+    appState.currentLang = appState.tempLang;
+
+    applyTheme();
+    applyFontSize();
+    saveSettings();
+
+    if (langChanged) {
+        updateTranslations();
+        applyLanguageStyle();
+        renderDashboard();
+        // [V56] If reader is active, reload content to reflect language change
+        if (appState.activeView === 'reader' && appState.currentBook) {
+            loadScripture(appState.currentBook, appState.currentChapter);
+        }
+    }
+
+    closeAppearanceSettings();
+    showToast(appState.currentLang === 'en' ? "Settings saved!" : "設定已儲存！");
 };
 

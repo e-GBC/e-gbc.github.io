@@ -5,9 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>年度讀經總覽 - 2026 聖經讀經</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/summary.css">
+    <link rel="stylesheet" href="css/style.css?v=1.1.12">
+    <link rel="stylesheet" href="css/summary.css?v=1.1.12">
+    <link id="theme-link" rel="stylesheet" href="css/theme-light.css?v=1.1.12">
 </head>
+
 
 <body>
     <header class="summary-header">
@@ -49,8 +51,17 @@
 
     <script src="../data/bible.js"></script>
     <script src="../data/bible_en.js"></script>
-    <script src="js/i18n.js"></script>
-    <script src="js/summary.js"></script>
+    <script src="js/i18n.js?v=1.1.12"></script>
+    <script src="js/summary.js?v=1.1.12"></script>
+    <script>
+        const savedTheme = localStorage.getItem('bible_reading_theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+            const themeLink = document.getElementById('theme-link');
+            if (themeLink) themeLink.href = 'css/theme-dark.css?v=1.1.12';
+        }
+    </script>
 </body>
+
 
 </html>
