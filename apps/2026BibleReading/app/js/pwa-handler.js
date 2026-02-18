@@ -50,6 +50,12 @@ function initPWALogic() {
  */
 window.createShortcut = () => {
     const isEn = getAppLang() === 'en';
+
+    // 如果在 iframe 中，通知父視窗觸發安裝提示
+    if (window.self !== window.top) {
+        window.parent.postMessage('triggerInstall', '*');
+    }
+
     if (isIOS) {
         showIOSGuide();
     } else if (deferredPrompt) {

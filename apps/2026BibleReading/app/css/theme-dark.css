@@ -182,3 +182,21 @@ body.dark-theme img[src*="qrcode"] {
     /* Keep white for scanning contrast */
     padding: 5px;
 }
+
+/* Reader Nav Horizontal Line */
+body.dark-theme .reader-nav {
+    border-top-color: #333 !important;
+}
+
+/* Dark Mode Catch-up Banner Colors */
+body.dark-theme .catch-up-banner {
+    background-color: #332b00 !important;
+    /* Dark yellow */
+    border-color: #443a00 !important;
+    color: #fff9c4 !important;
+    /* Pale yellow text */
+}
+
+body.dark-theme .catch-up-banner .banner-text strong {
+    color: #fffde7 !important;
+}

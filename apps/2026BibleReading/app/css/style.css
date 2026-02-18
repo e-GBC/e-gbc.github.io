@@ -497,6 +497,12 @@ body {
     font-size: 14px;
 }
 
+/* Aa Button Width */
+.btn-icon,
+body.dark-theme .btn-icon {
+    min-width: 60px;
+}
+
 /* Updated Buttons */
 .btn-text-small,
 .btn-blue {

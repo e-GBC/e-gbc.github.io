@@ -3,34 +3,64 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>懷恩堂 2026 聖經讀經</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>e-GBC</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2196F3">
     <link rel="icon" type="image/png" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <style>
-        body {
+        body,
+        html {
             margin: 0;
             padding: 0;
-            background: #f4f7f9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            font-family: sans-serif;
-            color: #666;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: #2196F3;
+        }
+
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
         }
     </style>
+    <script>
+        let deferredPrompt;
+        // 捕捉安裝提示
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        // 監聽來自 iframe 的安裝請求
+        window.addEventListener('message', (event) => {
+            if (event.data === 'triggerInstall' && deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    deferredPrompt = null;
+                });
+            }
+        });
+
+        // 註冊根目錄 Service Worker 以確保 PWA 可安裝
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('Root SW Registered'));
+            });
+        }
+    </script>
 </head>
 
 <body>
-    <div style="text-align:center">
-        <p>正在進入讀經計畫...</p>
-    </div>
-    <script>
-        // 無痕重新導向至新路徑
-        window.location.replace("./apps/2026BibleReading/app/index.html");
-    </script>
+    <iframe src="./apps/2026BibleReading/app/index.html" allow="autoplay; microphone"></iframe>
 </body>
 
 </html>

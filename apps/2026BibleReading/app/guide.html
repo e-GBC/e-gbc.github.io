@@ -4,23 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>使用說明書 - 懷恩堂 2026 聖經讀經</title>
-    <link rel="stylesheet" href="css/guide.css?v=1.1.12">
-    <link id="theme-link" rel="stylesheet" href="css/theme-light.css?v=1.1.12">
+    <title>使用說明書 - 懷恩堂2026讀經計畫</title>
+    <link rel="stylesheet" href="css/guide.css?v=1.1.18">
+    <link id="theme-link" rel="stylesheet" href="css/theme-light.css?v=1.1.18">
     <style>
         .btn-action {
             background: var(--primary-color);
             color: white;
-            padding: 15px 25px;
+            padding: 15px 20px;
             border-radius: 12px;
             border: none;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            margin: 20px auto;
+            margin: 20px 0;
             display: block;
             width: 100%;
-            max-width: 300px;
+            max-width: none;
             box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
             transition: all 0.2s;
             text-align: center;
@@ -139,7 +139,7 @@
                     <div class="list-item"><strong>進度總覽：</strong>以動畫模式看到整體進度</div>
 
                     <button class="btn-action"
-                        onclick="localStorage.removeItem('bible_reading_guide_finished'); window.location.href='index.html?showGuide=true';">再次觀看教學頁面</button>
+                        onclick="localStorage.removeItem('bible_reading_guide_finished'); window.location.href='index.html?showGuide=true';">觀看教學</button>
                 </div>
                 <div lang="en">
                     <p>Features include:</p>
@@ -148,7 +148,7 @@
                     <div class="list-item"><strong>Summary:</strong> View progress with animations.</div>
                     <button class="btn-action"
                         onclick="localStorage.removeItem('bible_reading_guide_finished'); window.location.href='index.html?showGuide=true';">Show
-                        Tutorial Again</button>
+                        Tutorial</button>
                 </div>
             </div>
         </section>
@@ -201,9 +201,9 @@
                     <p style="font-size: 16px; margin-bottom: 15px;">Invite you to join Bible reading plan!</p>
                     <p style="font-size: 16px; margin-bottom: 15px;">https://e-gbc.github.io/</p>
                 </div>
-                <button class="btn-action" style="margin: 0; max-width: none;" onclick="copyShareText()">
-                    <span lang="zh">點擊複製以下文字至剪貼簿</span>
-                    <span lang="en">Click to copy text to clipboard</span>
+                <button class="btn-action" style="margin: 0;" onclick="copyShareText()">
+                    <span lang="zh">點擊複製文字</span>
+                    <span lang="en">Copy text to clipboard</span>
                 </button>
             </div>
         </section>
@@ -244,7 +244,7 @@
         if (savedTheme === 'dark') {
             document.body.classList.add('dark-theme');
             const themeLink = document.getElementById('theme-link');
-            if (themeLink) themeLink.href = 'css/theme-dark.css?v=1.1.12';
+            if (themeLink) themeLink.href = 'css/theme-dark.css?v=1.1.18';
         }
         document.body.classList.add('guide-page-body');
 

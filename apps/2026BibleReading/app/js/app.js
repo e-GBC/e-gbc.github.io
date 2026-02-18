@@ -51,8 +51,8 @@ async function initApp() {
         loadProgress();
         updateTranslations();
         applyLanguageStyle();
-        applyTheme(); // [V55] Apply dark mode
-        applyFontSize(); // [V55] Apply saved font size
+        applyTheme();
+        applyFontSize();
         renderDashboard();
         switchView('dashboard');
 
@@ -141,7 +141,7 @@ window.finishGuide = () => {
 
 // --- LANGUAGE HANDLING ---
 window.toggleLanguage = () => {
-    // [V43] Stop audio first to prevent sync issues
+    // Stop audio first to prevent sync issues
     if (appState.isReading) {
         stopAudioReading();
     }
@@ -182,7 +182,6 @@ function applyTheme() {
     const isDark = appState.theme === 'dark';
     document.body.classList.toggle('dark-theme', isDark);
 
-    // [V1.1.13] Robust theme linking
     let themeLink = document.getElementById('theme-link');
     if (!themeLink) {
         themeLink = document.createElement('link');
@@ -190,7 +189,7 @@ function applyTheme() {
         themeLink.rel = 'stylesheet';
         document.head.appendChild(themeLink);
     }
-    themeLink.href = `css/theme-${isDark ? 'dark' : 'light'}.css?v=1.1.15`;
+    themeLink.href = `css/theme-${isDark ? 'dark' : 'light'}.css?v=1.1.18`;
 }
 
 function applyFontSize() {
@@ -347,7 +346,7 @@ function renderDashboard() {
         return;
     }
 
-    // [V51] UI Layout: Flush header contains the Description (Title).
+    // UI Layout: Flush header contains the Description (Title).
     // Original book name display is restored to h3.
     // In English mode, show the description but keep it concise.
     const isEn = appState.currentLang === 'en';
@@ -395,7 +394,7 @@ function renderDashboard() {
     }
     contentDiv.innerHTML = html;
 
-    // [V48] Update Month Navigation Labels to actual month names
+    // Update Month Navigation Labels to actual month names
     const prevMonthBtn = document.querySelector('[onclick="changeMonth(-1)"]');
     const nextMonthBtn = document.querySelector('[onclick="changeMonth(1)"]');
     if (prevMonthBtn && nextMonthBtn) {
@@ -443,7 +442,7 @@ function renderCatchUp() {
 
     if (earliestUnreadDate) {
         const t = translations[appState.currentLang];
-        // [V1.1.5] Improved centering for multi-line on mobile
+        // Improved centering for multi-line on mobile
         container.innerHTML = `
             <div class="catch-up-banner" onclick="goToDate('${earliestUnreadDate}')">
                 <span style="text-align: center; width: 100%;">⚡ ${t.catchUpParams[0]}<br>(${earliestUnreadDate})</span>
@@ -477,7 +476,7 @@ window.loadScripture = (bookNameZh, chapter) => {
         <div class="reader-chapter-title-secondary">${displayName}</div>
         ${html}
     `;
-    // [V1.1.16] Header title remains static as "Bible Reading / 經文閱讀"
+    // Header title remains static as "Bible Reading / 經文閱讀"
     // document.querySelector('.chapter-title').textContent = displayName;
 
     appState.currentBook = bookNameZh;
@@ -576,7 +575,7 @@ function updateStats() {
     const monthPercent = monthTotal > 0 ? (monthDone / monthTotal) * 100 : 0;
     document.querySelector('#monthly-bar').style.width = `${Math.round(monthPercent)}%`;
 
-    // [V1.1.13] Unified Progress Display
+    // Unified Progress Display
     const progressText = appState.currentLang === 'en' ? "Progress" : "完成";
     document.querySelector('.monthly-text').textContent =
         `${t.months[month]} ${progressText} ${monthDone} / ${monthTotal} ${t.chapterUnit} ( ${Math.round(monthPercent)}% )`;
@@ -1003,7 +1002,7 @@ function stopAudioReading() {
 
     if (audioTimer) clearTimeout(audioTimer);
 
-    // [V43] Clear Any Verse Highlights
+    // Clear Any Verse Highlights
     document.querySelectorAll('.verse-highlight').forEach(el => el.classList.remove('verse-highlight'));
 
     updateAudioBtn();
@@ -1095,11 +1094,11 @@ async function startReadingCurrentChapter() {
 
 let speechChunks = [];
 let voiceQueueIndex = 0;
-let lastMatchedVerseIdx = 0; // [V44] Prevent jumping back
+let lastMatchedVerseIdx = 0; // Prevent jumping back
 let currentUtterance = null;
 
 function readWithWebSpeech(text, lang) {
-    // [V43] Split by more punctuation
+    // Split by more punctuation
     speechChunks = text.split(/([.。\n!！?？;；,，:：])/).reduce((acc, part, i) => {
         if (i % 2 === 0) acc.push(part);
         else if (acc.length > 0) acc[acc.length - 1] += part;
@@ -1163,7 +1162,7 @@ function highlightVerseByText(text) {
 
     const verseElements = Array.from(reader.querySelectorAll('p'));
 
-    // [V44] Search forward from the last matched verse to prevent jumping backwards
+    // Search forward from the last matched verse to prevent jumping backwards
     let matchIdx = -1;
     for (let i = lastMatchedVerseIdx; i < verseElements.length; i++) {
         const verseText = (verseElements[i].querySelector('.verse-text')?.textContent || '').replace(/[.,!?:;，。！？：；\s]/g, '');
@@ -1233,7 +1232,7 @@ function handleReadingEnd() {
             setTimeout(() => startReadingCurrentChapter(), 500);
         }, 5000);
     } else {
-        // [V42] Auto-finish today's progress after 5s if last chapter
+        // Auto-finish today's progress after 5s if last chapter
         updateAudioBtn(true);
         showToast(appState.currentLang === 'en' ? "Daily plan finished! Completing..." : "今日進度已讀完，即將自動完成...");
         audioTimer = setTimeout(() => {
@@ -1259,9 +1258,7 @@ function findNextChapterToday() {
     return null;
 }
 
-window.createShortcut = () => {
-    alert("請點擊瀏覽器選單中的『安裝應用程式』或『加入主畫面』來建立桌面捷徑。");
-};
+
 
 // --- APPEARANCE SETTINGS ---
 window.showAppearanceSettings = () => {
@@ -1280,11 +1277,23 @@ window.showAppearanceSettings = () => {
 };
 
 window.closeAppearanceSettings = () => {
-    // Restore original theme if we are closing without saving
+    // Restore original values from storage if closing without saving
     appState.theme = localStorage.getItem('bible_reading_theme') || 'light';
-    applyTheme();
+    appState.currentLang = localStorage.getItem('bible_reading_lang') || 'zh';
+    appState.fontSizeIndex = parseInt(localStorage.getItem('bible_reading_font_idx')) || 2;
 
-    document.getElementById('appearance-overlay').classList.add('hidden');
+    applyTheme();
+    updateTranslations();
+    applyLanguageStyle();
+    applyFontSize();
+    renderDashboard();
+
+    if (appState.activeView === 'reader' && appState.currentBook) {
+        loadScripture(appState.currentBook, appState.currentChapter);
+    }
+
+    const overlay = document.getElementById('appearance-overlay');
+    if (overlay) overlay.classList.add('hidden');
     document.body.style.overflow = '';
 };
 
@@ -1295,7 +1304,17 @@ window.previewTheme = () => {
 };
 
 window.previewLang = () => {
-    appState.tempLang = document.getElementById('lang-toggle-setting').checked ? 'en' : 'zh';
+    const isEn = document.getElementById('lang-toggle-setting').checked;
+    appState.currentLang = isEn ? 'en' : 'zh';
+    appState.tempLang = appState.currentLang;
+
+    updateTranslations();
+    applyLanguageStyle();
+    renderDashboard();
+
+    if (appState.activeView === 'reader' && appState.currentBook) {
+        loadScripture(appState.currentBook, appState.currentChapter);
+    }
 };
 
 window.changeFontSizeLevel = (offset) => {
@@ -1309,20 +1328,36 @@ window.changeFontSizeLevel = (offset) => {
 function updateAppearancePreview() {
     const preview = document.getElementById('font-size-preview');
     if (preview) {
-        preview.style.fontSize = `${FONT_SIZES[appState.tempFontIdx]}pt`;
+        const size = FONT_SIZES[appState.tempFontIdx];
+        preview.style.fontSize = `${size}pt`;
+        preview.innerText = `${size}pt - Aa`;
     }
 }
 
+
 window.resetAppearance = () => {
     appState.theme = 'light';
+    appState.currentLang = 'zh';
+    appState.fontSizeIndex = 2;
+
+    // Sync temp values
     appState.tempTheme = 'light';
-    appState.tempFontIdx = 2;
     appState.tempLang = 'zh';
+    appState.tempFontIdx = 2;
 
     document.getElementById('theme-toggle').checked = false;
     document.getElementById('lang-toggle-setting').checked = false;
+
     applyTheme();
+    updateTranslations();
+    applyLanguageStyle();
+    applyFontSize();
+    renderDashboard();
     updateAppearancePreview();
+
+    if (appState.activeView === 'reader' && appState.currentBook) {
+        loadScripture(appState.currentBook, appState.currentChapter);
+    }
 };
 
 window.saveAppearance = () => {
@@ -1340,7 +1375,7 @@ window.saveAppearance = () => {
         updateTranslations();
         applyLanguageStyle();
         renderDashboard();
-        // [V56] If reader is active, reload content to reflect language change
+        // If reader is active, reload content to reflect language change
         if (appState.activeView === 'reader' && appState.currentBook) {
             loadScripture(appState.currentBook, appState.currentChapter);
         }
