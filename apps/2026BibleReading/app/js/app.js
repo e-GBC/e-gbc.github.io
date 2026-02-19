@@ -1070,22 +1070,48 @@ async function startReadingCurrentChapter() {
             return;
         }
 
-        // Generate and Play
+        // Generate and Play in chunks to prevent memory/timeout issues for long chapters
         try {
-            // console.log('[TTS-INIT] Generating speech with Transformers.js...');
-            const output = await ttsEngine(fullTextToRead, {
-                length_scale: 0.5,     // Updated: Very fast flow
-                noise_scale: 0.75,     // Updated: Emotional variance
-                noise_scale_w: 1.20    // Updated: Strong rhythm and breathing
-            });
+            const chunks = fullTextToRead.split(/([。！?？；\n])/).reduce((acc, part, i) => {
+                if (i % 2 === 0) acc.push(part);
+                else if (acc.length > 0) acc[acc.length - 1] += part;
+                return acc;
+            }, []).filter(s => s.trim().length > 0);
 
-            // output.audio is a Float32Array, output.sampling_rate is the rate
-            playAudioBuffer(output.audio, output.sampling_rate, () => {
-                handleReadingEnd();
-            });
+            let chunkIdx = 0;
+            const playSequentially = async () => {
+                if (!appState.isReading || chunkIdx >= chunks.length) {
+                    if (chunkIdx >= chunks.length) handleReadingEnd();
+                    return;
+                }
+
+                const chunk = chunks[chunkIdx];
+                try {
+                    const output = await ttsEngine(chunk, {
+                        length_scale: 0.5,
+                        noise_scale: 0.75,
+                        noise_scale_w: 1.20
+                    });
+
+                    playAudioBuffer(output.audio, output.sampling_rate, () => {
+                        chunkIdx++;
+                        playSequentially();
+                    });
+
+                    // Update highlighting
+                    highlightVerseByText(chunk);
+                } catch (e) {
+                    console.error('AI Chunk Generation error:', e);
+                    // Fallback remaining text to system voice
+                    const remaining = chunks.slice(chunkIdx).join('');
+                    readWithWebSpeech(remaining, 'zh-TW');
+                }
+            };
+
+            playSequentially();
         } catch (err) {
-            console.error('TTS Generation error:', err);
-            stopAudioReading();
+            console.error('TTS Initialization/Splitting error:', err);
+            readWithWebSpeech(fullTextToRead, 'zh-TW');
         }
     } else {
         readWithWebSpeech(fullTextToRead, 'en-US');
@@ -1122,19 +1148,24 @@ function playNextChunk(lang) {
     currentUtterance.lang = lang === 'en-US' ? 'en' : lang;
 
     const voices = window.speechSynthesis.getVoices();
-    let selectedVoice = voices.find(v => v.lang.startsWith(lang.split('-')[0]) && v.name.includes('Google')) ||
+    // Prioritize female voices for both ZH and EN
+    const femaleKeywords = ['Female', 'Zira', 'Samantha', 'Meijia', 'Xiaoxiao', 'Google US English', 'Google 國語'];
+
+    let selectedVoice = voices.find(v => v.lang.startsWith(lang.split('-')[0]) && femaleKeywords.some(k => v.name.includes(k))) ||
+        voices.find(v => v.lang.startsWith(lang.split('-')[0]) && v.name.includes('Google')) ||
         voices.find(v => v.lang.startsWith(lang.split('-')[0]) && v.name.includes('Microsoft')) ||
         voices.find(v => v.lang.startsWith(lang.split('-')[0]));
 
     if (selectedVoice) currentUtterance.voice = selectedVoice;
 
-    // Chinese AI parameters requested by user (applied to fallback as well)
+    // Harmonized parameters for both languages as requested
     if (lang === 'zh-TW') {
         currentUtterance.rate = 0.9;
         currentUtterance.pitch = 0.85;
     } else {
-        currentUtterance.rate = 0.85;
-        currentUtterance.pitch = 0.8;
+        // Updated English to match female parameters and speed
+        currentUtterance.rate = 0.9;
+        currentUtterance.pitch = 0.85;
     }
 
     currentUtterance.onend = () => {
