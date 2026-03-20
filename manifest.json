@@ -1,7 +1,7 @@
 {
-    "short_name": "e-GBC",
-    "name": "e-GBC",
-    "description": "懷恩堂 2026 聖經讀經計畫",
+    "short_name": "懷恩堂數位工具",
+    "name": "懷恩堂數位事工工具",
+    "description": "台北懷恩堂內部使用之數位工具，包含 2026 聖經讀經計畫",
     "icons": [
         {
             "src": "icons/icon-192x192.png",
