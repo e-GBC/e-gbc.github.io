@@ -189,7 +189,7 @@ function applyTheme() {
         themeLink.rel = 'stylesheet';
         document.head.appendChild(themeLink);
     }
-    themeLink.href = `css/theme-${isDark ? 'dark' : 'light'}.css?v=1.1.21`;
+    themeLink.href = `css/theme-${isDark ? 'dark' : 'light'}.css?v=1.1.22`;
 }
 
 function applyFontSize() {
@@ -390,7 +390,9 @@ function renderDashboard() {
     html += `</div>`;
 
     if (plan.items[0]) {
-        html += `<div style="padding-bottom: 20px;"><button class="btn-primary" onclick="loadScripture('${plan.items[0].book}', ${plan.items[0].chapter})">📖 ${t.startReading}</button></div>`;
+        const firstUnread = plan.items.find(item => !appState.chapterProgress[`${BOOK_MAP[item.book]}_${item.chapter}`]);
+        const targetItem = firstUnread || plan.items[0];
+        html += `<div style="padding-bottom: 20px;"><button class="btn-primary" onclick="loadScripture('${targetItem.book}', ${targetItem.chapter})">📖 ${t.startReading}</button></div>`;
     }
     contentDiv.innerHTML = html;
 
@@ -515,6 +517,27 @@ window.finishAndNext = (cBook, cChap, nBook, nChap) => {
 window.finishAndHome = (cBook, cChap) => {
     appState.chapterProgress[`${BOOK_MAP[cBook]}_${cChap}`] = true;
     saveProgress();
+    
+    // [New Logic] Catch-up Skip: If marked date < today, jump to next day directly
+    const todayStr = getDateKey(getTodayGMT8());
+    const currentStr = getDateKey(appState.currentDate);
+
+    if (currentStr < todayStr) {
+        const nextDate = new Date(appState.currentDate);
+        nextDate.setDate(nextDate.getDate() + 1);
+        if (nextDate <= YEAR_END) {
+            appState.currentDate = nextDate;
+            checkReturnButton();
+            const nextPlan = getPlanForDate(getDateKey(nextDate));
+            if (nextPlan && nextPlan.items.length > 0) {
+                // Auto-load next day's first chapter to keep reading momentum
+                loadScripture(nextPlan.items[0].book, nextPlan.items[0].chapter);
+                renderDashboard();
+                return;
+            }
+        }
+    }
+
     renderDashboard();
     alert(translations[appState.currentLang].congratsBody);
     switchView('dashboard');
