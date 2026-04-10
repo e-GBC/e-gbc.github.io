@@ -196,11 +196,11 @@
             <div class="share-box">
                 <div lang="zh">
                     <p style="font-size: 16px; margin-bottom: 15px;">邀請您進行一年讀經一遍的計畫！</p>
-                    <p style="font-size: 16px; margin-bottom: 15px;">https://e-gbc.github.io/</p>
+                    <p style="font-size: 16px; margin-bottom: 15px;">https://www.gbc.org.tw/e-gbc/</p>
                 </div>
                 <div lang="en">
                     <p style="font-size: 16px; margin-bottom: 15px;">Invite you to join Bible reading plan!</p>
-                    <p style="font-size: 16px; margin-bottom: 15px;">https://e-gbc.github.io/</p>
+                    <p style="font-size: 16px; margin-bottom: 15px;">https://www.gbc.org.tw/e-gbc/</p>
                 </div>
                 <button class="btn-action" style="margin: 0;" onclick="copyShareText()">
                     <span lang="zh">點擊複製文字</span>
@@ -222,8 +222,8 @@
     <script>
         function copyShareText() {
             const isEn = document.body.classList.contains('lang-en');
-            const zhText = "邀請您進行一年讀經一遍的計畫！\nhttps://e-gbc.github.io/";
-            const enText = "Invite you to join Bible reading plan!\nhttps://e-gbc.github.io/";
+            const zhText = "邀請您進行一年讀經一遍的計畫！\nhttps://www.gbc.org.tw/e-gbc/";
+            const enText = "Invite you to join Bible reading plan!\nhttps://www.gbc.org.tw/e-gbc/";
             const text = isEn ? enText : zhText;
             navigator.clipboard.writeText(text).then(() => {
                 alert(document.body.classList.contains('lang-en') ? "Copied!" : "已複製到剪貼簿");
