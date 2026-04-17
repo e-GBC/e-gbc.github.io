@@ -242,6 +242,47 @@ function loadProgress() {
 function saveProgress() {
     localStorage.setItem('bible_reading_progress_v2', JSON.stringify(appState.chapterProgress));
     updateStats();
+    checkGoalReached();
+}
+
+/**
+ * [New Analytics] Check if user has reached the latest reading goal (up to today)
+ */
+function checkGoalReached() {
+    const todayStr = getDateKey(getTodayGMT8());
+    const pastAndTodayPlans = appState.readingPlan.filter(p => p.date <= todayStr);
+    if (pastAndTodayPlans.length === 0) return;
+
+    let allFinished = true;
+    for (const p of pastAndTodayPlans) {
+        if (Array.isArray(p.chapters)) {
+            for (const ch of p.chapters) {
+                const key = `${BOOK_MAP[p.book] || p.book}_${ch}`;
+                if (!appState.chapterProgress[key]) {
+                    allFinished = false;
+                    break;
+                }
+            }
+        }
+        if (!allFinished) break;
+    }
+
+    if (allFinished) {
+        const lastGoalReachedDate = localStorage.getItem('last_goal_reached_date');
+        if (lastGoalReachedDate !== todayStr) {
+            sendGaEvent('goal_reached', { 'goal_date': todayStr });
+            localStorage.setItem('last_goal_reached_date', todayStr);
+        }
+    }
+}
+
+/**
+ * [New Analytics] Helper to send GA events safely
+ */
+function sendGaEvent(name, params = {}) {
+    if (typeof gtag === 'function') {
+        gtag('event', name, params);
+    }
 }
 
 function saveSettings() {
@@ -327,8 +368,17 @@ function checkReturnButton() {
 window.toggleChapter = (book, chapter) => {
     const abbr = BOOK_MAP[book] || book;
     const key = `${abbr}_${chapter}`;
-    if (appState.chapterProgress[key]) delete appState.chapterProgress[key];
-    else appState.chapterProgress[key] = true;
+    if (appState.chapterProgress[key]) {
+        delete appState.chapterProgress[key];
+    } else {
+        appState.chapterProgress[key] = true;
+        // Tracking: Manual circle click
+        sendGaEvent('chapter_completed', { 
+            'book': book, 
+            'chapter': chapter, 
+            'method': 'circle_click' 
+        });
+    }
     saveProgress();
     renderDashboard();
 };
@@ -508,14 +558,26 @@ function renderReaderNav(currentBookZh, currentChapter) {
 }
 
 window.finishAndNext = (cBook, cChap, nBook, nChap) => {
-    appState.chapterProgress[`${BOOK_MAP[cBook]}_${cChap}`] = true;
+    appState.chapterProgress[`${BOOK_MAP[cBook] || cBook}_${cChap}`] = true;
+    // Tracking: Manual reader navigation
+    sendGaEvent('chapter_completed', { 
+        'book': cBook, 
+        'chapter': cChap, 
+        'method': 'reader_next' 
+    });
     saveProgress();
     loadScripture(nBook, nChap);
     renderDashboard();
 };
 
 window.finishAndHome = (cBook, cChap) => {
-    appState.chapterProgress[`${BOOK_MAP[cBook]}_${cChap}`] = true;
+    appState.chapterProgress[`${BOOK_MAP[cBook] || cBook}_${cChap}`] = true;
+    // Tracking: Manual reader finish
+    sendGaEvent('chapter_completed', { 
+        'book': cBook, 
+        'chapter': cChap, 
+        'method': 'reader_finish' 
+    });
     saveProgress();
     
     // [New Logic] Catch-up Skip: If marked date < today, jump to next day directly
@@ -1290,7 +1352,15 @@ function handleReadingEnd() {
         updateAudioBtn(true);
         showToast(appState.currentLang === 'en' ? "Daily plan finished! Completing..." : "今日進度已讀完，即將自動完成...");
         audioTimer = setTimeout(() => {
-            appState.chapterProgress[`${BOOK_MAP[appState.currentBook]}_${appState.currentChapter}`] = true;
+            const cBook = appState.currentBook;
+            const cChap = appState.currentChapter;
+            appState.chapterProgress[`${BOOK_MAP[cBook] || cBook}_${cChap}`] = true;
+            // Tracking: Auto-finish after audio
+            sendGaEvent('chapter_completed', { 
+                'book': cBook, 
+                'chapter': cChap, 
+                'method': 'audio_auto_finish' 
+            });
             saveProgress();
             renderDashboard();
             stopAudioReading();
