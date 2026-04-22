@@ -190,7 +190,7 @@ function applyTheme() {
         themeLink.rel = 'stylesheet';
         document.head.appendChild(themeLink);
     }
-    themeLink.href = `css/theme-${isDark ? 'dark' : 'light'}.css?v=1.1.22`;
+    themeLink.href = `css/theme-${isDark ? 'dark' : 'light'}.css?v=1.1.23`;
 }
 
 function applyFontSize() {
@@ -1110,6 +1110,12 @@ window.toggleAudioReading = async () => {
     } else {
         appState.isReading = true;
         updateAudioBtn();
+        // [V23] Status Notification
+        if (appState.forceSystemVoice) {
+            showToast("正在使用系統穩定語音模式");
+        } else {
+            showToast("正在嘗試啟動 AI 高品質語音...");
+        }
         startReadingCurrentChapter();
     }
 };
