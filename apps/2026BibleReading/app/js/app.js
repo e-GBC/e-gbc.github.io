@@ -367,6 +367,19 @@ function getPlanForDate(dateStr) {
     return { date: dateStr, titles, items };
 }
 
+/**
+ * [BIBLE-V61] Centralized title formatting to handle "Psalms" (篇) vs "Chapters" (章)
+ */
+function formatChapterTitle(book, chapter) {
+    if (appState.currentLang === 'en') {
+        const entry = appState.readingPlan.find(p => p.book === book);
+        const bookNameEn = entry ? entry.book_en : book;
+        return `${bookNameEn} Chapter ${chapter}`;
+    }
+    const unit = (book === '詩篇' || book === 'Psalms') ? '篇' : '章';
+    return `${book} 第 ${chapter} ${unit}`;
+}
+
 window.changeDay = (offset) => {
     const newDate = new Date(appState.currentDate);
     newDate.setDate(newDate.getDate() + offset);
@@ -550,14 +563,13 @@ window.loadScripture = (bookNameZh, chapter) => {
     const abbr = BOOK_MAP[bookNameZh];
     let bookData, displayName;
 
+    displayName = formatChapterTitle(bookNameZh, chapter);
     if (appState.currentLang === 'en') {
         const entry = appState.readingPlan.find(p => p.book === bookNameZh);
         const bookNameEn = entry ? entry.book_en : bookNameZh;
         bookData = appState.parsedBibleEn[bookNameEn];
-        displayName = `${bookNameEn} Chapter ${chapter}`;
     } else {
         bookData = appState.parsedBibleZh[abbr];
-        displayName = `${bookNameZh} 第 ${chapter} 章`;
     }
 
     const verses = bookData[chapter];
@@ -1170,15 +1182,13 @@ async function startReadingCurrentChapter() {
     const abbr = BOOK_MAP[book];
 
     let bookData;
-    let displayName;
+    let displayName = formatChapterTitle(book, chapter);
     if (isEn) {
         const entry = appState.readingPlan.find(p => p.book === book);
         const bookNameEn = entry ? entry.book_en : book;
         bookData = appState.parsedBibleEn[bookNameEn];
-        displayName = `${bookNameEn} Chapter ${chapter}`;
     } else {
         bookData = appState.parsedBibleZh[abbr];
-        displayName = `${book} 第 ${chapter} 章`;
     }
 
     if (!bookData || !bookData[chapter]) {
@@ -1370,7 +1380,7 @@ window.skipToVerse = (book, chapter, vNum, event) => {
         .join(' ');
 
     const fullText = (vNum === 1) ?
-        (isEn ? `${appState.currentBook} Chapter ${chapter}. ${remainingVerses}` : `${book} 第 ${chapter} 章。${remainingVerses}`) :
+        (`${displayName}. ${remainingVerses}`) :
         remainingVerses;
 
     if (isEn) {
