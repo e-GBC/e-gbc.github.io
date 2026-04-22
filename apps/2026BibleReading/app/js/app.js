@@ -1385,6 +1385,7 @@ window.skipToVerse = (book, chapter, vNum, event) => {
         .map(([_, text]) => text)
         .join(' ');
 
+    const displayName = formatChapterTitle(book, chapter);
     const fullText = (vNum === 1) ?
         (`${displayName}. ${remainingVerses}`) :
         remainingVerses;
