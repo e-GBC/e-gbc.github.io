@@ -14,7 +14,8 @@ window.appState = {
     fontSizeIndex: parseInt(localStorage.getItem('bible_reading_font_idx')) || 2,
     activeView: 'dashboard',
     currentBook: null,
-    currentChapter: null
+    currentChapter: null,
+    forceSystemVoice: localStorage.getItem('bible_reading_force_system') === 'true'
 };
 
 const appState = window.appState;
@@ -289,6 +290,46 @@ function saveSettings() {
     localStorage.setItem('bible_reading_theme', appState.theme);
     localStorage.setItem('bible_reading_font_idx', appState.fontSizeIndex);
     localStorage.setItem('bible_reading_lang', appState.currentLang);
+    localStorage.setItem('bible_reading_force_system', appState.forceSystemVoice);
+}
+
+// --- WAKE LOCK & MEDIA SESSION ---
+let wakeLock = null;
+
+async function requestWakeLock() {
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+        }
+    } catch (err) {
+        console.warn('Wake Lock request failed:', err);
+    }
+}
+
+function releaseWakeLock() {
+    if (wakeLock) {
+        wakeLock.release();
+        wakeLock = null;
+    }
+}
+
+function updateMediaSession(book, chapter) {
+    if ('mediaSession' in navigator) {
+        const t = translations[appState.currentLang];
+        const displayBook = appState.currentLang === 'en' ? (appState.readingPlan.find(p => p.book === book)?.book_en || book) : book;
+        
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: `${displayBook} ${chapter}`,
+            artist: t.appTitle,
+            album: '2026 Bible Reading',
+            artwork: [
+                { src: 'icons/icon-192x192.png', sizes: '192x192', type: 'image/png' }
+            ]
+        });
+
+        navigator.mediaSession.setActionHandler('stop', stopAudioReading);
+        navigator.mediaSession.setActionHandler('pause', stopAudioReading);
+    }
 }
 
 // --- CORE LOGIC ---
@@ -976,6 +1017,7 @@ let isTtsInitializing = false;
 let aiVoiceFailedPermanently = localStorage.getItem('bible_tts_skip_ai') === 'true';
 
 async function initTtsEngine() {
+    if (appState.forceSystemVoice) return false; // Option A: Force system voice
     if (ttsEngine) return true;
     if (aiVoiceFailedPermanently) return false;
     if (isTtsInitializing) return false;
@@ -1090,6 +1132,7 @@ function stopAudioReading() {
     // Clear Any Verse Highlights
     document.querySelectorAll('.verse-highlight').forEach(el => el.classList.remove('verse-highlight'));
 
+    releaseWakeLock(); // Release lock when audio stops
     updateAudioBtn();
 }
 
@@ -1118,6 +1161,8 @@ function updateAudioBtn(isWaiting = false, isLoading = false) {
 async function startReadingCurrentChapter() {
     if (!appState.isReading) return;
 
+    requestWakeLock(); // Option C: Prevent screen sleep
+    
     // 1. Prepare Content
     const isEn = appState.currentLang === 'en';
     const book = appState.currentBook;
@@ -1144,6 +1189,8 @@ async function startReadingCurrentChapter() {
     const verses = bookData[chapter];
     const cleanVerses = Object.values(verses).join(' ');
     const fullTextToRead = isEn ? `${displayName}. ${cleanVerses}` : `${displayName}。 ${cleanVerses}`;
+    
+    updateMediaSession(book, chapter); // Option C: Background playback stability
     // console.log(`[TTS-PREPARE] Text length: ${fullTextToRead.length}, Lang: ${appState.currentLang}`);
 
     // 2. Use Sherpa-ONNX for Chinese voice, Fallback to Web Speech for English
@@ -1157,7 +1204,8 @@ async function startReadingCurrentChapter() {
 
         // Generate and Play in chunks to prevent memory/timeout issues for long chapters
         try {
-            const chunks = fullTextToRead.split(/([。！?？；\n])/).reduce((acc, part, i) => {
+            // Option B: Finer chunking (split by more punctuation to keep chunks small)
+            const chunks = fullTextToRead.split(/([。！?？；\n,，：:])/).reduce((acc, part, i) => {
                 if (i % 2 === 0) acc.push(part);
                 else if (acc.length > 0) acc[acc.length - 1] += part;
                 return acc;
@@ -1179,6 +1227,8 @@ async function startReadingCurrentChapter() {
                     });
 
                     playAudioBuffer(output.audio, output.sampling_rate, () => {
+                        // Clear memory references
+                        output.audio = null; 
                         chunkIdx++;
                         playSequentially();
                     });
@@ -1392,6 +1442,8 @@ window.showAppearanceSettings = () => {
 
     document.getElementById('theme-toggle').checked = appState.tempTheme === 'dark';
     document.getElementById('lang-toggle-setting').checked = appState.tempLang === 'en';
+    document.getElementById('force-system-voice-toggle').checked = appState.forceSystemVoice;
+
     applyTheme(); // Ensure initial state is correct
     updateAppearancePreview();
 
@@ -1479,6 +1531,9 @@ window.resetAppearance = () => {
     renderDashboard();
     updateAppearancePreview();
 
+    document.getElementById('force-system-voice-toggle').checked = false;
+    appState.forceSystemVoice = false;
+
     if (appState.activeView === 'reader' && appState.currentBook) {
         loadScripture(appState.currentBook, appState.currentChapter);
     }
@@ -1487,6 +1542,7 @@ window.resetAppearance = () => {
 window.saveAppearance = () => {
     appState.theme = appState.tempTheme;
     appState.fontSizeIndex = appState.tempFontIdx;
+    appState.forceSystemVoice = document.getElementById('force-system-voice-toggle').checked;
 
     const langChanged = appState.currentLang !== appState.tempLang;
     appState.currentLang = appState.tempLang;
