@@ -254,6 +254,8 @@
                             console.log('[SW] Deleting cache:', name);
                             caches.delete(name);
                         }
+                        // Reset AI voice failure flag to allow re-trying AI voice
+                        localStorage.removeItem('bible_tts_skip_ai');
                         console.log('[SW] Cache cleared. Force reloading...');
                         location.reload(true);
                     });
