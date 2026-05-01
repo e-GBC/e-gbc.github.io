@@ -11,7 +11,7 @@ window.appState = {
     chapterProgress: {},
     currentLang: localStorage.getItem('bible_reading_lang') || 'zh',
     theme: localStorage.getItem('bible_reading_theme') || 'light',
-    fontSizeIndex: parseInt(localStorage.getItem('bible_reading_font_idx')) || 2, // Default to 16pt (index 2)
+    fontSizeIndex: parseInt(localStorage.getItem('bible_reading_font_idx')) || 1, // Default to 14pt (index 1)
     activeView: 'dashboard',
     currentBook: null,
     currentChapter: null,
@@ -1474,7 +1474,7 @@ window.closeAppearanceSettings = () => {
     // Restore original values from storage if closing without saving
     appState.theme = localStorage.getItem('bible_reading_theme') || 'light';
     appState.currentLang = localStorage.getItem('bible_reading_lang') || 'zh';
-    appState.fontSizeIndex = parseInt(localStorage.getItem('bible_reading_font_idx')) || 2;
+    appState.fontSizeIndex = parseInt(localStorage.getItem('bible_reading_font_idx')) || 1;
 
     applyTheme();
     updateTranslations();
@@ -1532,12 +1532,12 @@ function updateAppearancePreview() {
 window.resetAppearance = () => {
     appState.theme = 'light';
     appState.currentLang = 'zh';
-    appState.fontSizeIndex = 2; // Default 16pt
+    appState.fontSizeIndex = 1; // Default 14pt
 
     // Sync temp values
     appState.tempTheme = 'light';
     appState.tempLang = 'zh';
-    appState.tempFontIdx = 2;
+    appState.tempFontIdx = 1;
 
     document.getElementById('theme-toggle').checked = false;
     document.getElementById('lang-toggle-setting').checked = false;
