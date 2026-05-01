@@ -11,7 +11,7 @@ window.appState = {
     chapterProgress: {},
     currentLang: localStorage.getItem('bible_reading_lang') || 'zh',
     theme: localStorage.getItem('bible_reading_theme') || 'light',
-    fontSizeIndex: parseInt(localStorage.getItem('bible_reading_font_idx')) || 2,
+    fontSizeIndex: parseInt(localStorage.getItem('bible_reading_font_idx')) || 1, // Default to 16pt (index 1)
     activeView: 'dashboard',
     currentBook: null,
     currentChapter: null,
@@ -23,7 +23,7 @@ const appState = window.appState;
 // --- CONSTANTS ---
 const YEAR_START = new Date("2026-01-01T00:00:00+08:00");
 const YEAR_END = new Date("2026-12-31T23:59:59+08:00");
-const FONT_SIZES = [12, 14, 16, 17, 18, 20];
+const FONT_SIZES = [14, 16, 18, 20, 22, 24, 26, 28];
 
 const BOOK_MAP = {
     "創世記": "創", "出埃及記": "出", "利未記": "利", "民數記": "民", "申命記": "申",
@@ -929,6 +929,7 @@ window.toggleFontSize = () => {
     appState.fontSizeIndex = (appState.fontSizeIndex + 1) % FONT_SIZES.length;
     applyFontSize();
     saveSettings();
+    showToast(`${FONT_SIZES[appState.fontSizeIndex]}pt`);
 };
 
 // --- TOOL SHEET ---
@@ -1473,7 +1474,7 @@ window.closeAppearanceSettings = () => {
     // Restore original values from storage if closing without saving
     appState.theme = localStorage.getItem('bible_reading_theme') || 'light';
     appState.currentLang = localStorage.getItem('bible_reading_lang') || 'zh';
-    appState.fontSizeIndex = parseInt(localStorage.getItem('bible_reading_font_idx')) || 2;
+    appState.fontSizeIndex = parseInt(localStorage.getItem('bible_reading_font_idx')) || 1;
 
     applyTheme();
     updateTranslations();
@@ -1531,12 +1532,12 @@ function updateAppearancePreview() {
 window.resetAppearance = () => {
     appState.theme = 'light';
     appState.currentLang = 'zh';
-    appState.fontSizeIndex = 2;
+    appState.fontSizeIndex = 1; // Default 16pt
 
     // Sync temp values
     appState.tempTheme = 'light';
     appState.tempLang = 'zh';
-    appState.tempFontIdx = 2;
+    appState.tempFontIdx = 1;
 
     document.getElementById('theme-toggle').checked = false;
     document.getElementById('lang-toggle-setting').checked = false;
