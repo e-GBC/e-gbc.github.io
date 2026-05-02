@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>正在前往 Google Chat 下載頁面</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; color: #333; }
+        .btn { display: inline-block; padding: 15px 25px; margin: 10px; background: #1a73e8; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h2>正在為您的裝置開啟商店...</h2>
+    <p>如果沒有自動跳轉，請點擊下方按鈕：</p>
+    
+    <a href="https://apps.apple.com/app/google-chat/id1163852619" class="btn">iPhone 下載</a>
+    <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.dynamite" class="btn">Android 下載</a>
+    <a href="https://chat.google.com/app/" class="btn">網頁版 (PC)</a>
+
+    <script>
+        (function() {
+            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            var iosUrl = "https://apps.apple.com/app/google-chat/id1163852619";
+            var androidUrl = "https://play.google.com/store/apps/details?id=com.google.android.apps.dynamite";
+            var pcUrl = "https://chat.google.com/app/";
+
+            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                window.location.href = iosUrl;
+            } else if (/android/i.test(userAgent)) {
+                window.location.href = androidUrl;
+            } else {
+                window.location.href = pcUrl;
+            }
+        })();
+    </script>
+</body>
+</html>
