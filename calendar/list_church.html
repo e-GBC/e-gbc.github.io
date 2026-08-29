@@ -15,28 +15,33 @@
   
   * { box-sizing: border-box; }
 
+  /* 電腦版設定 max-width: 720px 並水平居中 */
   body {
     font-family: 'Noto Sans TC', sans-serif;
-    margin: 0;
-    padding: 8px 8px 65px 8px; /* 留出 65px 給固定的 footer */
+    margin: 0 auto;
+    padding: 8px 8px 65px 8px;
+    max-width: 720px;
     background: var(--bg-gray);
     color: #202124;
     overflow-x: hidden;
   }
 
-  /* 2 & 3. 凍結強固固定於頁面底部的 Footer */
+  /* 固定的 Footer 在電腦版同步限制 max-width: 720px 並居中 */
   .fixed-footer {
     position: fixed;
     bottom: 0;
-    left: 0;
-    right: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 720px;
     background: #FFFFFF;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
     padding: 8px 14px;
     z-index: 1000;
     display: flex;
     justify-content: center;
     align-items: center;
+    border-radius: 12px 12px 0 0;
   }
 
   .month-nav {
@@ -227,12 +232,12 @@
     flex-shrink: 0;
   }
 
-  /* 4. 第二排與後續：允許標題與備註換行 (可以延伸到第三排) */
+  /* 第二排與後續：允許標題與備註換行 */
   .row-bottom {
     display: flex;
     align-items: baseline;
     gap: 6px;
-    flex-wrap: wrap; /* 允許換行 */
+    flex-wrap: wrap;
   }
 
   .row-bottom .title {
@@ -240,7 +245,7 @@
     font-weight: 700;
     color: #111;
     line-height: 1.35;
-    white-space: normal; /* 允許自然換行 */
+    white-space: normal;
     word-break: break-word;
   }
 
@@ -248,7 +253,7 @@
     font-size: 13px;
     color: #70757a;
     font-weight: 400;
-    white-space: normal; /* 允許自然換行 */
+    white-space: normal;
     word-break: break-word;
   }
 
@@ -259,6 +264,7 @@
     .col-main { padding: 6px 8px; }
     .row-bottom .title { font-size: 17px; }
     .row-bottom .note-txt { font-size: 12px; }
+    .fixed-footer { border-radius: 0; }
   }
 </style>
 </head>
@@ -270,7 +276,7 @@
 <!-- 日曆快選彈窗 -->
 <div id="pickerPopup" class="picker-popup" style="display:none;"></div>
 
-<!-- 2 & 3. 固定的 Footer 導覽列 -->
+<!-- 固定的 Footer 導覽列 -->
 <footer class="fixed-footer">
   <div class="month-nav">
     <div class="nav-center">
