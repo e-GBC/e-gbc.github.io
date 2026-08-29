@@ -18,7 +18,7 @@
   body {
     font-family: 'Noto Sans TC', sans-serif;
     margin: 0;
-    padding: 10px;
+    padding: 8px;
     background: var(--bg-gray);
     color: #202124;
     overflow-x: hidden;
@@ -28,7 +28,7 @@
     text-align: center;
     color: var(--navy);
     font-size: 20px;
-    margin: 0 0 10px 0;
+    margin: 0 0 8px 0;
     font-weight: 700;
   }
 
@@ -41,7 +41,7 @@
     padding: 6px 12px;
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     gap: 8px;
   }
 
@@ -140,14 +140,14 @@
   .picker-grid .day-cell.in-week { background: #E8EAF6; font-weight: 700; }
   .picker-grid .day-cell.empty { visibility: hidden; }
 
-  /* 雙排高度精簡卡片結構 */
+  /* 卡片結構：固定 2 排高度 */
   .event-card {
     background: var(--card-bg);
     border-radius: 10px;
     margin-bottom: 8px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.04);
     display: grid;
-    grid-template-columns: 60px 1fr;
+    grid-template-columns: 58px 1fr;
     overflow: hidden;
     border: 1px solid #EAEAEA;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -157,7 +157,7 @@
     box-shadow: 0 3px 8px rgba(0,0,0,0.08);
   }
 
-  /* 左側日期方塊 */
+  /* 左側日期方塊：僅包含「月」與「日」 */
   .col-date {
     background: var(--navy);
     color: #fff;
@@ -166,26 +166,29 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 6px 2px;
+    padding: 8px 0;
   }
   .col-date .month { font-size: 11px; opacity: 0.85; line-height: 1; }
-  .col-date .day { font-size: 22px; font-weight: 700; line-height: 1.1; margin: 1px 0; }
+  .col-date .day { font-size: 24px; font-weight: 700; line-height: 1; margin-top: 3px; }
 
-  /* 右側內容區：限定最多兩排 */
+  /* 右側內容區：強制作為兩排絕不折行 */
   .col-main {
     display: flex;
     flex-direction: column;
     padding: 6px 12px;
     justify-content: center;
-    gap: 2px;
+    gap: 3px;
+    min-width: 0; /* 防止子元素溢出 */
   }
 
-  /* 第一排：星期、類型、場地、時間 */
+  /* 第一排：[週六] [活動] 📍場地 ⏰時間 */
   .row-top {
     display: flex;
     align-items: center;
     gap: 6px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   .tag-weekday {
@@ -193,8 +196,9 @@
     color: #FFFFFF;
     font-size: 11px;
     font-weight: 700;
-    padding: 1px 6px;
+    padding: 1px 7px;
     border-radius: 4px;
+    flex-shrink: 0;
   }
 
   .tag-type {
@@ -203,6 +207,7 @@
     padding: 1px 8px;
     border-radius: 999px;
     white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .meta-info {
@@ -211,35 +216,45 @@
     display: inline-flex;
     align-items: center;
     gap: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
-  /* 第二排：活動名稱 + 備註（灰色小字） */
+  /* 第二排：活動名稱 + 備註（同排顯示） */
   .row-bottom {
     display: flex;
     align-items: baseline;
     gap: 8px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .row-bottom .title {
     font-size: 15px;
     font-weight: 700;
     color: #111;
-    line-height: 1.3;
+    line-height: 1.2;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .row-bottom .note-txt {
     font-size: 13px;
     color: #70757a;
     font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   #loading, .empty { text-align: center; padding: 30px 16px; color: #666; font-size: 14px; }
 
   @media (max-width: 480px) {
-    body { padding: 6px; }
-    .col-main { padding: 6px 10px; }
-    .row-bottom .title { font-size: 15px; }
+    body { padding: 4px; }
+    .col-main { padding: 5px 8px; }
+    .row-bottom .title { font-size: 14px; }
     .row-bottom .note-txt { font-size: 12px; }
   }
 </style>
@@ -344,32 +359,32 @@
       const [y, m, d] = ev.date.split('/');
       const color = ev.type ? (TYPE_COLORS[ev.type] || { bg: '#E8EAF6', fg: '#0D184E' }) : null;
       
-      // 第一排：星期、類型、場地、時間
+      // 第一排：[週六] (深藍標籤) + [活動] (類型標籤) + 📍場地 + ⏰時間
       const metaItems = [];
       if (ev.weekday) metaItems.push(`<span class="tag-weekday">週${escapeHtml(ev.weekday)}</span>`);
       if (ev.type) metaItems.push(`<span class="tag-type" style="background:${color.bg};color:${color.fg}">${escapeHtml(ev.type)}</span>`);
       if (ev.location) metaItems.push(`<span class="meta-info">📍 ${escapeHtml(ev.location)}</span>`);
       if (ev.time) metaItems.push(`<span class="meta-info">⏰ ${escapeHtml(formatTime(ev.time))}</span>`);
 
-      // 第二排：活動名稱 + 備註（灰色小字）
+      // 第二排：活動名稱 + 備註（同排顯示）
       const noteText = ev.description || ev.note || '';
 
       return `
         <div class="event-card">
-          <!-- 左側日期區 -->
+          <!-- 左側日期區：僅 9月 + 5 -->
           <div class="col-date">
             <div class="month">${parseInt(m)}月</div>
             <div class="day">${parseInt(d)}</div>
           </div>
 
-          <!-- 右側內容區（限定兩排） -->
+          <!-- 右側內容區（絕不折行，固定兩排） -->
           <div class="col-main">
-            <!-- 第一排：星期、類型、場地、時間 -->
+            <!-- 第一排：[週六] [活動] 📍場地 ⏰時間 -->
             <div class="row-top">
               ${metaItems.join('')}
             </div>
             
-            <!-- 第二排：活動名稱 + 備註（灰色小字） -->
+            <!-- 第二排：活動名稱 + 備註（同排顯示） -->
             <div class="row-bottom">
               <span class="title">${escapeHtml(ev.title)}</span>
               ${noteText ? `<span class="note-txt">${escapeHtml(noteText)}</span>` : ''}
