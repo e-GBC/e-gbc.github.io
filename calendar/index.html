@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>教會全年行事曆</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --navy: #0D184E; }
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: #F5F6F8;
+  }
+  h1 {
+    text-align: center;
+    color: var(--navy);
+    font-size: 26px;
+    margin: 0 0 16px;
+  }
+  .month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .month-nav button {
+    border: none;
+    background: var(--navy);
+    color: white;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  .month-nav button:disabled { background: #C7CBE0; cursor: not-allowed; }
+  .view-toggle { display: flex; align-items: center; gap: 6px; margin-left: 12px; cursor: pointer; }
+  .toggle-txt { font-size: 13px; color: var(--navy); font-weight: 700; }
+  .view-toggle input { display: none; }
+  .toggle-slider {
+    width: 38px; height: 22px; background: #C7CBE0; border-radius: 999px;
+    position: relative; transition: background 0.2s ease;
+  }
+  .toggle-slider::before {
+    content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%;
+    background: #fff; top: 2px; left: 2px; transition: transform 0.2s ease;
+  }
+  .view-toggle input:checked + .toggle-slider { background: var(--navy); }
+  .view-toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+  .picker-popup {
+    max-width: 300px;
+    margin: 0 auto 16px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    padding: 12px;
+  }
+  .picker-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .picker-nav button { border: none; background: none; font-size: 16px; cursor: pointer; color: var(--navy); }
+  .picker-nav .label { font-weight: 700; color: var(--navy); }
+  .picker-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; font-size: 13px; }
+  .picker-grid .wd-head { color: #999; font-size: 11px; padding: 4px 0; }
+  .picker-grid .day-cell { padding: 6px 0; border-radius: 6px; cursor: pointer; }
+  .picker-grid .day-cell:hover { background: #E8EAF6; }
+  .picker-grid .day-cell.in-week { background: #E8EAF6; font-weight: 700; }
+  .picker-grid .day-cell.empty { visibility: hidden; }
+  .month-label {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--navy);
+    min-width: 100px;
+    text-align: center;
+  }
+  .event-card {
+    background: #ffffff;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: grid;
+    grid-template-columns: 68px 96px 1fr;
+    overflow: hidden;
+  }
+  .col-date {
+    background: var(--navy);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8px 4px;
+  }
+  .col-date .month { font-size: 13px; opacity: 0.85; }
+  .col-date .day { font-size: 26px; font-weight: 700; line-height: 1.15; }
+  .col-type {
+    border-right: 1px solid #EEE;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8px 6px;
+    gap: 5px;
+  }
+  .type-tag {
+    font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 999px;
+    background: #E8EAF6; color: var(--navy); white-space: nowrap;
+  }
+  .col-type .weekday { font-size: 14px; font-weight: 700; color: var(--navy); }
+  .col-main {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 14px;
+    justify-content: center;
+    gap: 4px;
+  }
+  .main-row1 { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .main-row1 .title { font-size: 19px; font-weight: 700; color: #202124; }
+  .main-row1 .desc { font-size: 14px; color: #888; }
+  .main-row2 { display: flex; gap: 14px; font-size: 14px; color: #5f6368; }
+  .main-row2 span { display: inline-flex; align-items: center; gap: 3px; }
+  .main-row3 { font-size: 14px; color: #A13D3D; display: flex; align-items: center; gap: 3px; }
+  #loading, .empty { text-align: center; padding: 40px 20px; color: #666; font-size: 16px; }
+  @media (max-width: 560px) {
+    .event-card { grid-template-columns: 56px 82px 1fr; }
+    .main-row1 .title { font-size: 16px; }
+    .col-date .day { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>教會全年行事曆</h1>
+<div class="month-nav">
+  <button id="prevBtn">‹</button>
+  <span class="month-label" id="monthLabel" style="cursor:pointer; text-decoration:underline dotted;"></span>
+  <button id="nextBtn">›</button>
+  <label class="view-toggle">
+    <span class="toggle-txt">週</span>
+    <input type="checkbox" id="viewToggle">
+    <span class="toggle-slider"></span>
+    <span class="toggle-txt">月</span>
+  </label>
+</div>
+<div id="pickerPopup" class="picker-popup" style="display:none;"></div>
+<div id="loading">📅 載入行事曆中...</div>
+<div id="events-container"></div>
+
+<script>
+  // ⚠️ 部署GAS後，把網址貼在這裡
+  const API_URL = "https://script.google.com/macros/s/AKfycbyjxsCWM8-w-BPdvd80ZyE8ruYzwbx-e5z3ked_V2Tyn0tAvGVbHget9qrLZuDH0obl/exec";
+
+  const TYPE_COLORS = {
+    '音樂': { bg: '#E0EEF7', fg: '#2C5F8A' },
+    '活動': { bg: '#E4F1E6', fg: '#3F7D42' },
+    '課程': { bg: '#DCEEEA', fg: '#2F8577' },
+    '行政': { bg: '#EAEAEA', fg: '#5B6B73' },
+  };
+
+  function formatTime(t) {
+    if (!t) return '';
+    const digits = t.toString().padStart(4, '0');
+    return `${digits.slice(0, 2)}:${digits.slice(2)}`;
+  }
+
+  const FALLBACK_EVENTS = [
+    { date: '2026/09/04', weekday: '五', type: '例行團契', title: '女高音林蕭淳頤聲樂獨唱會', time: '19:30', location: '大堂', description: '本季音樂會系列第一場', note: '' },
+    { date: '2026/09/06', weekday: '日', type: '行政公告', title: '第三季主日學開學', time: '09:30', location: '各教室', description: '', note: '9/6-11/29' },
+    { date: '2026/09/16', weekday: '三', type: '大型事工', title: '臻軒學苑開課', time: '19:00', location: 'B01', description: '每週固定場次', note: '9/16-12/2' },
+    { date: '2026/10/25', weekday: '日', type: '教會大事記', title: '感恩節主日', time: '', location: '', description: '', note: '' },
+  ];
+
+  let allEvents = [];
+  let weekStart = getMonday(new Date());
+
+  function getMonday(date) {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    const day = d.getDay(); // 0=日 1=一 ... 6=六
+    const diff = day === 0 ? -6 : 1 - day;
+    d.setDate(d.getDate() + diff);
+    return d;
+  }
+  function addDays(date, n) {
+    const d = new Date(date);
+    d.setDate(d.getDate() + n);
+    return d;
+  }
+  function fmtMD(date) {
+    return `${date.getMonth() + 1}/${date.getDate()}`;
+  }
+  function toDateKey(date) {
+    return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;
+  }
+  function eventsInWeek(monday) {
+    const keys = new Set();
+    for (let i = 0; i < 7; i++) keys.add(toDateKey(addDays(monday, i)));
+    return allEvents.filter(ev => keys.has(ev.date));
+  }
+  function eventsInMonth(monthAnchor) {
+    const y = monthAnchor.getFullYear(), m = monthAnchor.getMonth() + 1;
+    return allEvents.filter(ev => {
+      const [ey, em] = ev.date.split('/').map(Number);
+      return ey === y && em === m;
+    });
+  }
+
+  function escapeHtml(str) {
+    return (str || '').toString()
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function cardsHtml(events) {
+    return events.map(ev => {
+      const [y, m, d] = ev.date.split('/');
+      const color = ev.type ? (TYPE_COLORS[ev.type] || { bg: '#EEE', fg: '#555' }) : null;
+      const metaParts = [];
+      if (ev.location) metaParts.push(`<span>📍 ${escapeHtml(ev.location)}</span>`);
+      if (ev.time) metaParts.push(`<span>⏰ ${escapeHtml(formatTime(ev.time))}</span>`);
+      return `
+        <div class="event-card">
+          <div class="col-date">
+            <div class="month">${parseInt(m)}月</div>
+            <div class="day">${parseInt(d)}</div>
+          </div>
+          <div class="col-type">
+            ${ev.type ? `<span class="type-tag" style="background:${color.bg};color:${color.fg}">${escapeHtml(ev.type)}</span>` : ''}
+            <div class="weekday">週${ev.weekday}</div>
+          </div>
+          <div class="col-main">
+            <div class="main-row1">
+              <span class="title">${escapeHtml(ev.title)}</span>
+              ${ev.description ? `<span class="desc">${escapeHtml(ev.description)}</span>` : ''}
+            </div>
+            ${metaParts.length ? `<div class="main-row2">${metaParts.join('')}</div>` : ''}
+            ${ev.note ? `<div class="main-row3">📅 ${escapeHtml(ev.note)}</div>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  let isWeekMode = true;
+  let monthAnchor = new Date(); // 月視圖用：該月1號
+
+  function render() {
+    if (isWeekMode) renderWeekView(); else renderMonthView();
+  }
+
+  function renderWeekView() {
+    const sunday = addDays(weekStart, 6);
+    document.getElementById('monthLabel').textContent = `${fmtMD(weekStart)} - ${fmtMD(sunday)}`;
+
+    const events = eventsInWeek(weekStart);
+    document.getElementById('prevBtn').disabled = !allEvents.some(ev => ev.date < toDateKey(weekStart));
+    document.getElementById('nextBtn').disabled = !allEvents.some(ev => ev.date > toDateKey(sunday));
+
+    const container = document.getElementById('events-container');
+    document.getElementById('loading').style.display = 'none';
+    container.innerHTML = events.length ? cardsHtml(events) : '<div class="empty">本週未登記重點事工</div>';
+  }
+
+  function renderMonthView() {
+    document.getElementById('monthLabel').textContent = `${monthAnchor.getFullYear()}年${monthAnchor.getMonth() + 1}月`;
+
+    const events = eventsInMonth(monthAnchor);
+    const monthStartKey = toDateKey(new Date(monthAnchor.getFullYear(), monthAnchor.getMonth(), 1));
+    const monthEndKey = toDateKey(new Date(monthAnchor.getFullYear(), monthAnchor.getMonth() + 1, 0));
+    document.getElementById('prevBtn').disabled = !allEvents.some(ev => ev.date < monthStartKey);
+    document.getElementById('nextBtn').disabled = !allEvents.some(ev => ev.date > monthEndKey);
+
+    const container = document.getElementById('events-container');
+    document.getElementById('loading').style.display = 'none';
+    container.innerHTML = events.length ? cardsHtml(events) : '<div class="empty">本月未登記重點事工</div>';
+  }
+
+  document.getElementById('viewToggle').addEventListener('change', (e) => {
+    const switchingToMonth = e.target.checked; // 開=月，關=週
+    if (switchingToMonth) {
+      const sunday = addDays(weekStart, 6); // 週→月：用週的最後一天(週日)判斷月份
+      monthAnchor = new Date(sunday.getFullYear(), sunday.getMonth(), 1);
+    } else {
+      weekStart = getMonday(monthAnchor); // 月→週：用月的第一天判斷週數
+    }
+    isWeekMode = !switchingToMonth;
+    render();
+  });
+
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    if (isWeekMode) { weekStart = addDays(weekStart, -7); }
+    else { monthAnchor = new Date(monthAnchor.getFullYear(), monthAnchor.getMonth() - 1, 1); }
+    render();
+  });
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    if (isWeekMode) { weekStart = addDays(weekStart, 7); }
+    else { monthAnchor = new Date(monthAnchor.getFullYear(), monthAnchor.getMonth() + 1, 1); }
+    render();
+  });
+
+  // ---------- 日曆快選彈窗（週日為第一欄，僅影響彈窗本身的版面） ----------
+  let pickerMonth = new Date(weekStart);
+  const popup = document.getElementById('pickerPopup');
+
+  function renderPicker() {
+    const y = pickerMonth.getFullYear(), m = pickerMonth.getMonth();
+    const firstDay = new Date(y, m, 1).getDay();
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    const sunday = addDays(weekStart, 6);
+
+    let cells = '';
+    for (let i = 0; i < firstDay; i++) cells += `<div class="day-cell empty"></div>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const cellDate = new Date(y, m, d);
+      const inWeek = isWeekMode
+        ? (cellDate >= weekStart && cellDate <= sunday)
+        : (y === monthAnchor.getFullYear() && m === monthAnchor.getMonth());
+      cells += `<div class="day-cell ${inWeek ? 'in-week' : ''}" data-y="${y}" data-m="${m}" data-d="${d}">${d}</div>`;
+    }
+
+    popup.innerHTML = `
+      <div class="picker-nav">
+        <button id="pickerPrev">‹</button>
+        <span class="label">${y}年${m + 1}月</span>
+        <button id="pickerNext">›</button>
+      </div>
+      <div class="picker-grid">
+        <div class="wd-head">日</div><div class="wd-head">一</div><div class="wd-head">二</div>
+        <div class="wd-head">三</div><div class="wd-head">四</div><div class="wd-head">五</div><div class="wd-head">六</div>
+        ${cells}
+      </div>
+    `;
+    popup.querySelector('#pickerPrev').addEventListener('click', () => {
+      pickerMonth = new Date(y, m - 1, 1);
+      renderPicker();
+    });
+    popup.querySelector('#pickerNext').addEventListener('click', () => {
+      pickerMonth = new Date(y, m + 1, 1);
+      renderPicker();
+    });
+    popup.querySelectorAll('.day-cell:not(.empty)').forEach(cell => {
+      cell.addEventListener('click', () => {
+        const picked = new Date(+cell.dataset.y, +cell.dataset.m, +cell.dataset.d);
+        if (isWeekMode) weekStart = getMonday(picked);
+        else monthAnchor = new Date(picked.getFullYear(), picked.getMonth(), 1);
+        popup.style.display = 'none';
+        render();
+      });
+    });
+  }
+
+  document.getElementById('monthLabel').addEventListener('click', () => {
+    const showing = popup.style.display !== 'none';
+    if (showing) {
+      popup.style.display = 'none';
+    } else {
+      pickerMonth = isWeekMode ? new Date(weekStart) : new Date(monthAnchor);
+      renderPicker();
+      popup.style.display = 'block';
+    }
+  });
+
+  function init(events) {
+    allEvents = events;
+    if (events.length) {
+      const firstDate = new Date(events[0].date.replace(/\//g, '-'));
+      weekStart = getMonday(firstDate);
+      monthAnchor = new Date(firstDate.getFullYear(), firstDate.getMonth(), 1);
+    }
+    render();
+  }
+
+  if (API_URL) {
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(init)
+      .catch(err => {
+        console.error('無法載入資料:', err);
+        document.getElementById('loading').innerHTML = '❌ 載入失敗，請確認網址是否正確';
+      });
+  } else {
+    init(FALLBACK_EVENTS); // API_URL未設定時，顯示示範資料方便預覽排版
+  }
+</script>
+
+</body>
+</html>
