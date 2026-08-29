@@ -26,7 +26,7 @@
     overflow-x: hidden;
   }
 
-  /* 固定的 Footer 在電腦版同步限制 max-width: 720px 並居中 */
+  /* 固定的 Footer */
   .fixed-footer {
     position: fixed;
     bottom: 0;
@@ -132,7 +132,7 @@
   .view-toggle input:checked + .toggle-slider { background: var(--navy); }
   .view-toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
 
-  /* 快選日曆彈窗 (彈出於底部上方) */
+  /* 快選日曆彈窗 */
   .picker-popup {
     position: fixed;
     bottom: 60px;
@@ -166,11 +166,22 @@
     grid-template-columns: 58px 1fr;
     overflow: hidden;
     border: 1px solid #EAEAEA;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
   }
 
   .event-card:hover {
     box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  }
+
+  /* 具備點擊連結時的樣式與懸停反饋 */
+  .event-card.has-link {
+    cursor: pointer;
+  }
+
+  .event-card.has-link:hover {
+    box-shadow: 0 4px 12px rgba(13, 24, 78, 0.15);
+    border-color: var(--navy);
+    transform: translateY(-1px);
   }
 
   /* 左側日期方塊 */
@@ -249,6 +260,14 @@
     word-break: break-word;
   }
 
+  .row-bottom .link-icon {
+    font-size: 13px;
+    color: var(--navy);
+    margin-left: 2px;
+    font-weight: bold;
+    display: inline-block;
+  }
+
   .row-bottom .note-txt {
     font-size: 13px;
     color: #70757a;
@@ -323,11 +342,11 @@
   }
 
   const FALLBACK_EVENTS = [
-    { date: '2026/09/04', weekday: '五', type: '週五音樂會', title: '女高音林蕭淳頤聲樂獨唱會', time: '1930', location: '', description: '', note: '' },
-    { date: '2026/09/05', weekday: '六', type: '活動', title: '興隆社宅事工', time: '1930', location: '', description: '主題：手作', note: '' },
-    { date: '2026/09/06', weekday: '日', type: '課程', title: '第三季主日學開學', time: '', location: '', description: '歡迎踴躍報名參加各級課程', note: '' },
-    { date: '2026/09/09', weekday: '三', type: '課程', title: '信徒裝備課程', time: '1900', location: 'B01', description: '', note: '' },
-    { date: '2026/09/11', weekday: '五', type: '音樂', title: '平安月詩歌敬拜與感恩音樂分享會', time: '1945', location: '大堂', description: '邀請全體弟兄姊妹一同參與敬拜', note: '' },
+    { date: '2026/09/04', weekday: '五', type: '週五音樂會', title: '女高音林蕭淳頤聲樂獨唱會', time: '1930', location: '', description: '', note: '', link: 'https://sites.google.com/gbc.org.tw/friday-concert/' },
+    { date: '2026/09/05', weekday: '六', type: '活動', title: '興隆社宅事工', time: '1930', location: '', description: '主題：手作', note: '', link: '' },
+    { date: '2026/09/06', weekday: '日', type: '課程', title: '第三季主日學開學', time: '', location: '', description: '歡迎踴躍報名參加各級課程', note: '', link: '' },
+    { date: '2026/09/09', weekday: '三', type: '課程', title: '信徒裝備課程', time: '1900', location: 'B01', description: '', note: '', link: '' },
+    { date: '2026/09/11', weekday: '五', type: '音樂', title: '平安月詩歌敬拜與感恩音樂分享會', time: '1945', location: '大堂', description: '邀請全體弟兄姊妹一同參與敬拜', note: '', link: '' },
   ];
 
   let allEvents = [];
@@ -383,9 +402,17 @@
       if (ev.time) metaItems.push(`<span class="meta-info">⏰ ${escapeHtml(formatTime(ev.time))}</span>`);
 
       const noteText = ev.description || ev.note || '';
+      
+      // 判斷是否有填寫 K 欄點擊連結
+      const rawLink = ev.link || ev.url || '';
+      const hasLink = rawLink && rawLink.trim() !== '';
+      const cleanLink = hasLink ? rawLink.trim() : '';
+
+      const cardClass = hasLink ? 'event-card has-link' : 'event-card';
+      const clickAttr = hasLink ? `onclick="window.open('${escapeHtml(cleanLink)}', '_blank')"` : '';
 
       return `
-        <div class="event-card">
+        <div class="${cardClass}" ${clickAttr}>
           <div class="col-date">
             <div class="month">${parseInt(m)}月</div>
             <div class="day">${parseInt(d)}</div>
@@ -398,6 +425,7 @@
             
             <div class="row-bottom">
               <span class="title">${escapeHtml(ev.title)}</span>
+              ${hasLink ? `<span class="link-icon" title="開啟相關連結">↗</span>` : ''}
               ${noteText ? `<span class="note-txt">${escapeHtml(noteText)}</span>` : ''}
             </div>
           </div>
