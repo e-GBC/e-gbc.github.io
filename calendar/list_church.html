@@ -32,23 +32,23 @@
     font-weight: 700;
   }
 
-  /* 導覽列與切換區塊 */
+  /* 1. 上方時間切換物件水平置中 */
   .month-nav {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     background: #FFFFFF;
-    padding: 6px 12px;
+    padding: 8px 16px;
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-    margin-bottom: 8px;
-    gap: 8px;
+    margin-bottom: 10px;
+    gap: 16px;
   }
 
   .nav-center {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
   }
 
   .nav-btn {
@@ -71,7 +71,7 @@
   .nav-btn:disabled { background: #C7CBE0; cursor: not-allowed; opacity: 0.6; }
 
   .month-label {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--navy);
     cursor: pointer;
@@ -157,7 +157,7 @@
     box-shadow: 0 3px 8px rgba(0,0,0,0.08);
   }
 
-  /* 左側日期方塊：僅包含「月」與「日」 */
+  /* 左側日期方塊 */
   .col-date {
     background: var(--navy);
     color: #fff;
@@ -171,17 +171,17 @@
   .col-date .month { font-size: 11px; opacity: 0.85; line-height: 1; }
   .col-date .day { font-size: 24px; font-weight: 700; line-height: 1; margin-top: 3px; }
 
-  /* 右側內容區：強制作為兩排絕不折行 */
+  /* 右側內容區 */
   .col-main {
     display: flex;
     flex-direction: column;
     padding: 6px 12px;
     justify-content: center;
-    gap: 3px;
-    min-width: 0; /* 防止子元素溢出 */
+    gap: 4px;
+    min-width: 0;
   }
 
-  /* 第一排：[週六] [活動] 📍場地 ⏰時間 */
+  /* 第一排：星期、類型、場地、時間 */
   .row-top {
     display: flex;
     align-items: center;
@@ -191,9 +191,8 @@
     overflow: hidden;
   }
 
+  /* 3. 星期標籤樣式：依星期別呈現不同強度辨識度 */
   .tag-weekday {
-    background: var(--navy);
-    color: #FFFFFF;
     font-size: 11px;
     font-weight: 700;
     padding: 1px 7px;
@@ -220,7 +219,7 @@
     flex-shrink: 0;
   }
 
-  /* 第二排：活動名稱 + 備註（同排顯示） */
+  /* 第二排：活動名稱 + 備註 */
   .row-bottom {
     display: flex;
     align-items: baseline;
@@ -231,8 +230,9 @@
     text-overflow: ellipsis;
   }
 
+  /* 2. 活動標題放大 3 級 (從 15px 升至 18px) */
   .row-bottom .title {
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 700;
     color: #111;
     line-height: 1.2;
@@ -254,8 +254,9 @@
   @media (max-width: 480px) {
     body { padding: 4px; }
     .col-main { padding: 5px 8px; }
-    .row-bottom .title { font-size: 14px; }
+    .row-bottom .title { font-size: 17px; } /* 手機版維護良好視覺 */
     .row-bottom .note-txt { font-size: 12px; }
+    .month-nav { gap: 10px; }
   }
 </style>
 </head>
@@ -301,6 +302,16 @@
     '教會大事記': { bg: '#FEF7E0', fg: '#B06000' },
   };
 
+  // 3. 週別標籤樣式分配：週一～四較淺，週五六日高辨識度
+  function getWeekdayStyle(wd) {
+    switch (wd) {
+      case '日': return 'background: #C5221F; color: #FFFFFF;'; // 週日：醒目典雅紅
+      case '六': return 'background: #0D184E; color: #FFFFFF;'; // 週六：經典深藍
+      case '五': return 'background: #0284C7; color: #FFFFFF;'; // 週五：亮寶藍
+      default:   return 'background: #EAECEF; color: #475569;'; // 週一～四：柔和淡灰底
+    }
+  }
+
   function formatTime(t) {
     if (!t) return '';
     const digits = t.toString().padStart(4, '0');
@@ -311,6 +322,7 @@
     { date: '2026/09/04', weekday: '五', type: '週五音樂會', title: '女高音林蕭淳頤聲樂獨唱會', time: '1930', location: '', description: '', note: '' },
     { date: '2026/09/05', weekday: '六', type: '活動', title: '興隆社宅事工', time: '1930', location: '', description: '主題：手作', note: '' },
     { date: '2026/09/06', weekday: '日', type: '課程', title: '第三季主日學開學', time: '', location: '', description: '', note: '' },
+    { date: '2026/09/09', weekday: '三', type: '課程', title: '信徒裝備課程', time: '1900', location: 'B01', description: '', note: '' },
     { date: '2026/09/11', weekday: '五', type: '音樂', title: '平安月詩歌敬拜', time: '1945', location: '', description: '', note: '' },
   ];
 
@@ -358,33 +370,34 @@
     return events.map(ev => {
       const [y, m, d] = ev.date.split('/');
       const color = ev.type ? (TYPE_COLORS[ev.type] || { bg: '#E8EAF6', fg: '#0D184E' }) : null;
-      
-      // 第一排：[週六] (深藍標籤) + [活動] (類型標籤) + 📍場地 + ⏰時間
+      const weekdayStyle = getWeekdayStyle(ev.weekday);
+
+      // 第一排：[週別] + [類型] + 📍場地 + ⏰時間
       const metaItems = [];
-      if (ev.weekday) metaItems.push(`<span class="tag-weekday">週${escapeHtml(ev.weekday)}</span>`);
+      if (ev.weekday) metaItems.push(`<span class="tag-weekday" style="${weekdayStyle}">週${escapeHtml(ev.weekday)}</span>`);
       if (ev.type) metaItems.push(`<span class="tag-type" style="background:${color.bg};color:${color.fg}">${escapeHtml(ev.type)}</span>`);
       if (ev.location) metaItems.push(`<span class="meta-info">📍 ${escapeHtml(ev.location)}</span>`);
       if (ev.time) metaItems.push(`<span class="meta-info">⏰ ${escapeHtml(formatTime(ev.time))}</span>`);
 
-      // 第二排：活動名稱 + 備註（同排顯示）
+      // 第二排：活動名稱 + 備註
       const noteText = ev.description || ev.note || '';
 
       return `
         <div class="event-card">
-          <!-- 左側日期區：僅 9月 + 5 -->
+          <!-- 左側日期區 -->
           <div class="col-date">
             <div class="month">${parseInt(m)}月</div>
             <div class="day">${parseInt(d)}</div>
           </div>
 
-          <!-- 右側內容區（絕不折行，固定兩排） -->
+          <!-- 右側內容區 -->
           <div class="col-main">
-            <!-- 第一排：[週六] [活動] 📍場地 ⏰時間 -->
+            <!-- 第一排 -->
             <div class="row-top">
               ${metaItems.join('')}
             </div>
             
-            <!-- 第二排：活動名稱 + 備註（同排顯示） -->
+            <!-- 第二排 -->
             <div class="row-bottom">
               <span class="title">${escapeHtml(ev.title)}</span>
               ${noteText ? `<span class="note-txt">${escapeHtml(noteText)}</span>` : ''}
