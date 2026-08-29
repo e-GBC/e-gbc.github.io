@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>教會全年行事曆</title>
+<title>教會行事曆</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root { 
@@ -18,31 +18,37 @@
   body {
     font-family: 'Noto Sans TC', sans-serif;
     margin: 0;
-    padding: 8px;
+    padding: 8px 8px 65px 8px; /* 留出 65px 給固定的 footer */
     background: var(--bg-gray);
     color: #202124;
     overflow-x: hidden;
   }
 
-  h1.page-title {
-    text-align: center;
-    color: var(--navy);
-    font-size: 20px;
-    margin: 0 0 8px 0;
-    font-weight: 700;
+  /* 2 & 3. 凍結強固固定於頁面底部的 Footer */
+  .fixed-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #FFFFFF;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+    padding: 8px 14px;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
-  /* 1. 上方時間切換物件水平置中 */
   .month-nav {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #FFFFFF;
-    padding: 8px 16px;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-    margin-bottom: 10px;
+    background: transparent;
+    padding: 0;
+    margin: 0;
     gap: 16px;
+    width: 100%;
+    max-width: 450px;
   }
 
   .nav-center {
@@ -55,10 +61,10 @@
     border: none;
     background: var(--navy);
     color: white;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    font-size: 15px;
+    font-size: 16px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -98,8 +104,8 @@
   .view-toggle input { display: none; }
 
   .toggle-slider {
-    width: 34px;
-    height: 18px;
+    width: 36px;
+    height: 20px;
     background: #C7CBE0;
     border-radius: 999px;
     position: relative;
@@ -109,8 +115,8 @@
   .toggle-slider::before {
     content: '';
     position: absolute;
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     background: #fff;
     top: 2px;
@@ -121,14 +127,19 @@
   .view-toggle input:checked + .toggle-slider { background: var(--navy); }
   .view-toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
 
-  /* 快選日曆彈窗 */
+  /* 快選日曆彈窗 (彈出於底部上方) */
   .picker-popup {
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
     max-width: 300px;
-    margin: 0 auto 10px;
     background: #fff;
     border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     padding: 12px;
+    z-index: 1001;
   }
   .picker-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
   .picker-nav button { border: none; background: none; font-size: 16px; cursor: pointer; color: var(--navy); }
@@ -140,7 +151,7 @@
   .picker-grid .day-cell.in-week { background: #E8EAF6; font-weight: 700; }
   .picker-grid .day-cell.empty { visibility: hidden; }
 
-  /* 卡片結構：固定 2 排高度 */
+  /* 卡片結構 */
   .event-card {
     background: var(--card-bg);
     border-radius: 10px;
@@ -186,12 +197,9 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    flex-wrap: nowrap;
-    white-space: nowrap;
-    overflow: hidden;
+    flex-wrap: wrap;
   }
 
-  /* 3. 星期標籤樣式：依星期別呈現不同強度辨識度 */
   .tag-weekday {
     font-size: 11px;
     font-weight: 700;
@@ -219,76 +227,67 @@
     flex-shrink: 0;
   }
 
-  /* 第二排：活動名稱 + 備註 */
+  /* 4. 第二排與後續：允許標題與備註換行 (可以延伸到第三排) */
   .row-bottom {
     display: flex;
     align-items: baseline;
-    gap: 8px;
-    flex-wrap: nowrap;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    gap: 6px;
+    flex-wrap: wrap; /* 允許換行 */
   }
 
-  /* 2. 活動標題放大 3 級 (從 15px 升至 18px) */
   .row-bottom .title {
     font-size: 18px;
     font-weight: 700;
     color: #111;
-    line-height: 1.2;
-    white-space: nowrap;
-    flex-shrink: 0;
+    line-height: 1.35;
+    white-space: normal; /* 允許自然換行 */
+    word-break: break-word;
   }
 
   .row-bottom .note-txt {
     font-size: 13px;
     color: #70757a;
     font-weight: 400;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal; /* 允許自然換行 */
+    word-break: break-word;
   }
 
-  #loading, .empty { text-align: center; padding: 30px 16px; color: #666; font-size: 14px; }
+  #loading, .empty { text-align: center; padding: 40px 16px; color: #666; font-size: 14px; }
 
   @media (max-width: 480px) {
-    body { padding: 4px; }
-    .col-main { padding: 5px 8px; }
-    .row-bottom .title { font-size: 17px; } /* 手機版維護良好視覺 */
+    body { padding: 6px 6px 60px 6px; }
+    .col-main { padding: 6px 8px; }
+    .row-bottom .title { font-size: 17px; }
     .row-bottom .note-txt { font-size: 12px; }
-    .month-nav { gap: 10px; }
   }
 </style>
 </head>
 <body>
 
-<h1 class="page-title" id="pageTitle">教會全年行事曆</h1>
-
-<div class="month-nav">
-  <div class="nav-center">
-    <button class="nav-btn" id="prevBtn">‹</button>
-    <span class="month-label" id="monthLabel"></span>
-    <button class="nav-btn" id="nextBtn">›</button>
-  </div>
-  <label class="view-toggle">
-    <span class="toggle-txt">週</span>
-    <input type="checkbox" id="viewToggle">
-    <span class="toggle-slider"></span>
-    <span class="toggle-txt">月</span>
-  </label>
-</div>
-
-<div id="pickerPopup" class="picker-popup" style="display:none;"></div>
 <div id="loading">📅 載入行事曆中...</div>
 <div id="events-container"></div>
 
-<script>
-  // 網址參數傳入 hideTitle=1 時自動隱藏頂部標題
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('hideTitle') === '1') {
-    document.getElementById('pageTitle').style.display = 'none';
-  }
+<!-- 日曆快選彈窗 -->
+<div id="pickerPopup" class="picker-popup" style="display:none;"></div>
 
+<!-- 2 & 3. 固定的 Footer 導覽列 -->
+<footer class="fixed-footer">
+  <div class="month-nav">
+    <div class="nav-center">
+      <button class="nav-btn" id="prevBtn">‹</button>
+      <span class="month-label" id="monthLabel"></span>
+      <button class="nav-btn" id="nextBtn">›</button>
+    </div>
+    <label class="view-toggle">
+      <span class="toggle-txt">週</span>
+      <input type="checkbox" id="viewToggle">
+      <span class="toggle-slider"></span>
+      <span class="toggle-txt">月</span>
+    </label>
+  </div>
+</footer>
+
+<script>
   const API_URL = "https://script.google.com/macros/s/AKfycbyjxsCWM8-w-BPdvd80ZyE8ruYzwbx-e5z3ked_V2Tyn0tAvGVbHget9qrLZuDH0obl/exec";
 
   const TYPE_COLORS = {
@@ -302,13 +301,12 @@
     '教會大事記': { bg: '#FEF7E0', fg: '#B06000' },
   };
 
-  // 3. 週別標籤樣式分配：週一～四較淺，週五六日高辨識度
   function getWeekdayStyle(wd) {
     switch (wd) {
-      case '日': return 'background: #C5221F; color: #FFFFFF;'; // 週日：醒目典雅紅
-      case '六': return 'background: #0D184E; color: #FFFFFF;'; // 週六：經典深藍
-      case '五': return 'background: #0284C7; color: #FFFFFF;'; // 週五：亮寶藍
-      default:   return 'background: #EAECEF; color: #475569;'; // 週一～四：柔和淡灰底
+      case '日': return 'background: #C5221F; color: #FFFFFF;';
+      case '六': return 'background: #0D184E; color: #FFFFFF;';
+      case '五': return 'background: #0284C7; color: #FFFFFF;';
+      default:   return 'background: #EAECEF; color: #475569;';
     }
   }
 
@@ -321,9 +319,9 @@
   const FALLBACK_EVENTS = [
     { date: '2026/09/04', weekday: '五', type: '週五音樂會', title: '女高音林蕭淳頤聲樂獨唱會', time: '1930', location: '', description: '', note: '' },
     { date: '2026/09/05', weekday: '六', type: '活動', title: '興隆社宅事工', time: '1930', location: '', description: '主題：手作', note: '' },
-    { date: '2026/09/06', weekday: '日', type: '課程', title: '第三季主日學開學', time: '', location: '', description: '', note: '' },
+    { date: '2026/09/06', weekday: '日', type: '課程', title: '第三季主日學開學', time: '', location: '', description: '歡迎踴躍報名參加各級課程', note: '' },
     { date: '2026/09/09', weekday: '三', type: '課程', title: '信徒裝備課程', time: '1900', location: 'B01', description: '', note: '' },
-    { date: '2026/09/11', weekday: '五', type: '音樂', title: '平安月詩歌敬拜', time: '1945', location: '', description: '', note: '' },
+    { date: '2026/09/11', weekday: '五', type: '音樂', title: '平安月詩歌敬拜與感恩音樂分享會', time: '1945', location: '大堂', description: '邀請全體弟兄姊妹一同參與敬拜', note: '' },
   ];
 
   let allEvents = [];
@@ -372,32 +370,26 @@
       const color = ev.type ? (TYPE_COLORS[ev.type] || { bg: '#E8EAF6', fg: '#0D184E' }) : null;
       const weekdayStyle = getWeekdayStyle(ev.weekday);
 
-      // 第一排：[週別] + [類型] + 📍場地 + ⏰時間
       const metaItems = [];
       if (ev.weekday) metaItems.push(`<span class="tag-weekday" style="${weekdayStyle}">週${escapeHtml(ev.weekday)}</span>`);
       if (ev.type) metaItems.push(`<span class="tag-type" style="background:${color.bg};color:${color.fg}">${escapeHtml(ev.type)}</span>`);
       if (ev.location) metaItems.push(`<span class="meta-info">📍 ${escapeHtml(ev.location)}</span>`);
       if (ev.time) metaItems.push(`<span class="meta-info">⏰ ${escapeHtml(formatTime(ev.time))}</span>`);
 
-      // 第二排：活動名稱 + 備註
       const noteText = ev.description || ev.note || '';
 
       return `
         <div class="event-card">
-          <!-- 左側日期區 -->
           <div class="col-date">
             <div class="month">${parseInt(m)}月</div>
             <div class="day">${parseInt(d)}</div>
           </div>
 
-          <!-- 右側內容區 -->
           <div class="col-main">
-            <!-- 第一排 -->
             <div class="row-top">
               ${metaItems.join('')}
             </div>
             
-            <!-- 第二排 -->
             <div class="row-bottom">
               <span class="title">${escapeHtml(ev.title)}</span>
               ${noteText ? `<span class="note-txt">${escapeHtml(noteText)}</span>` : ''}
