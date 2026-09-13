@@ -2,6 +2,15 @@
  * 2026 Bible Reading App - Core Logic
  */
 
+function safeGetLocalStorage(key, defaultVal) {
+    try {
+        const val = localStorage.getItem(key);
+        return val !== null ? val : defaultVal;
+    } catch (e) {
+        return defaultVal;
+    }
+}
+
 // State Management
 window.appState = {
     currentDate: getTodayGMT8(),
@@ -9,13 +18,13 @@ window.appState = {
     parsedBibleZh: {},
     parsedBibleEn: {},
     chapterProgress: {},
-    currentLang: localStorage.getItem('bible_reading_lang') || 'zh',
-    theme: localStorage.getItem('bible_reading_theme') || 'light',
-    fontSizeIndex: localStorage.getItem('bible_reading_font_idx') !== null ? parseInt(localStorage.getItem('bible_reading_font_idx')) : 1, // Default to 14pt (index 1)
+    currentLang: safeGetLocalStorage('bible_reading_lang', 'zh'),
+    theme: safeGetLocalStorage('bible_reading_theme', 'light'),
+    fontSizeIndex: safeGetLocalStorage('bible_reading_font_idx', null) !== null ? parseInt(safeGetLocalStorage('bible_reading_font_idx', '1')) : 1, // Default to 14pt (index 1)
     activeView: 'dashboard',
     currentBook: null,
     currentChapter: null,
-    forceSystemVoice: localStorage.getItem('bible_reading_force_system') === 'true'
+    forceSystemVoice: safeGetLocalStorage('bible_reading_force_system', 'false') === 'true'
 };
 
 const appState = window.appState;
@@ -48,8 +57,13 @@ document.addEventListener("DOMContentLoaded", initApp);
 
 async function initApp() {
     try {
+        // Request persistent storage to protect data from mobile eviction
+        if (navigator.storage && navigator.storage.persist) {
+            navigator.storage.persist().catch(() => {});
+        }
+
         await loadData();
-        loadProgress();
+        await loadProgress();
         updateTranslations();
         applyLanguageStyle();
         applyTheme();
@@ -235,13 +249,102 @@ function parseBibleArray(lines) {
     return bible;
 }
 
-function loadProgress() {
-    const saved = localStorage.getItem('bible_reading_progress_v2');
-    if (saved) appState.chapterProgress = JSON.parse(saved);
+// --- DUAL-LAYER STORAGE (IndexedDB + LocalStorage with Auto-Repair) ---
+const IDB_NAME = 'GBC_BibleReading_DB';
+const IDB_VERSION = 1;
+const IDB_STORE = 'reading_progress';
+
+function openProgressDB() {
+    return new Promise((resolve) => {
+        if (!window.indexedDB) return resolve(null);
+        try {
+            const req = indexedDB.open(IDB_NAME, IDB_VERSION);
+            req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(IDB_STORE)) {
+                    db.createObjectStore(IDB_STORE);
+                }
+            };
+            req.onsuccess = (e) => resolve(e.target.result);
+            req.onerror = () => resolve(null);
+        } catch (e) {
+            resolve(null);
+        }
+    });
+}
+
+async function getProgressFromIDB() {
+    try {
+        const db = await openProgressDB();
+        if (!db) return null;
+        return new Promise((resolve) => {
+            const tx = db.transaction(IDB_STORE, 'readonly');
+            const store = tx.objectStore(IDB_STORE);
+            const req = store.get('chapterProgress');
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = () => resolve(null);
+        });
+    } catch (e) {
+        return null;
+    }
+}
+
+async function saveProgressToIDB(data) {
+    try {
+        const db = await openProgressDB();
+        if (!db) return;
+        const tx = db.transaction(IDB_STORE, 'readwrite');
+        const store = tx.objectStore(IDB_STORE);
+        store.put(data, 'chapterProgress');
+    } catch (e) {
+        console.warn('[Storage] IDB write failed:', e);
+    }
+}
+
+async function loadProgress() {
+    let loadedFromLS = false;
+    try {
+        const saved = localStorage.getItem('bible_reading_progress_v2');
+        if (saved) {
+            appState.chapterProgress = JSON.parse(saved);
+            loadedFromLS = true;
+        }
+    } catch (e) {
+        console.warn('[Storage] localStorage read failed:', e);
+    }
+
+    // Secondary recovery & sync with IndexedDB
+    try {
+        const idbData = await getProgressFromIDB();
+        if (idbData && typeof idbData === 'object') {
+            const idbKeys = Object.keys(idbData).length;
+            const lsKeys = Object.keys(appState.chapterProgress || {}).length;
+            if (idbKeys > lsKeys) {
+                console.log(`[Storage] Restored progress from IndexedDB (${idbKeys} chapters)`);
+                appState.chapterProgress = Object.assign({}, idbData, appState.chapterProgress);
+                try {
+                    localStorage.setItem('bible_reading_progress_v2', JSON.stringify(appState.chapterProgress));
+                } catch (err) {}
+                updateStats();
+                renderDashboard();
+            } else if (lsKeys > 0 && idbKeys === 0) {
+                saveProgressToIDB(appState.chapterProgress);
+            }
+        } else if (loadedFromLS && Object.keys(appState.chapterProgress || {}).length > 0) {
+            saveProgressToIDB(appState.chapterProgress);
+        }
+    } catch (e) {
+        console.warn('[Storage] IDB sync error:', e);
+    }
 }
 
 function saveProgress() {
-    localStorage.setItem('bible_reading_progress_v2', JSON.stringify(appState.chapterProgress));
+    try {
+        localStorage.setItem('bible_reading_progress_v2', JSON.stringify(appState.chapterProgress));
+    } catch (e) {
+        console.warn('[Storage] localStorage save failed (quota or restricted):', e);
+    }
+    saveProgressToIDB(appState.chapterProgress);
     updateStats();
     checkGoalReached();
 }
@@ -1238,9 +1341,9 @@ async function startReadingCurrentChapter() {
                 const chunk = chunks[chunkIdx];
                 try {
                     const output = await ttsEngine(chunk, {
-                        length_scale: 0.5,
-                        noise_scale: 0.75,
-                        noise_scale_w: 1.20
+                        length_scale: 1.0, // Natural reading speed (was 0.5 causing unintelligible 2x compression)
+                        noise_scale: 0.667,
+                        noise_scale_w: 0.8
                     });
 
                     playAudioBuffer(output.audio, output.sampling_rate, () => {
@@ -1274,6 +1377,18 @@ let speechChunks = [];
 let voiceQueueIndex = 0;
 let lastMatchedVerseIdx = 0; // Prevent jumping back
 let currentUtterance = null;
+let systemVoices = [];
+
+function loadSystemVoices() {
+    if ('speechSynthesis' in window) {
+        const v = window.speechSynthesis.getVoices();
+        if (v && v.length > 0) systemVoices = v;
+    }
+}
+if ('speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = loadSystemVoices;
+    loadSystemVoices();
+}
 
 function readWithWebSpeech(text, lang) {
     // Split by more punctuation
@@ -1297,28 +1412,30 @@ function playNextChunk(lang) {
 
     const chunkText = speechChunks[voiceQueueIndex];
     currentUtterance = new SpeechSynthesisUtterance(chunkText);
-    currentUtterance.lang = lang === 'en-US' ? 'en' : lang;
+    const isZh = lang.startsWith('zh');
+    currentUtterance.lang = isZh ? 'zh-TW' : (lang === 'en-US' ? 'en-US' : lang);
 
-    const voices = window.speechSynthesis.getVoices();
-    // Prioritize female voices for both ZH and EN
-    const femaleKeywords = ['Female', 'Zira', 'Samantha', 'Meijia', 'Xiaoxiao', 'Google US English', 'Google 國語'];
+    const availableVoices = (window.speechSynthesis.getVoices().length > 0) ? window.speechSynthesis.getVoices() : systemVoices;
+    let selectedVoice = null;
 
-    let selectedVoice = voices.find(v => v.lang.startsWith(lang.split('-')[0]) && femaleKeywords.some(k => v.name.includes(k))) ||
-        voices.find(v => v.lang.startsWith(lang.split('-')[0]) && v.name.includes('Google')) ||
-        voices.find(v => v.lang.startsWith(lang.split('-')[0]) && v.name.includes('Microsoft')) ||
-        voices.find(v => v.lang.startsWith(lang.split('-')[0]));
+    if (isZh) {
+        // High-quality Taiwanese Traditional Chinese voices
+        const twKeywords = ['美佳', 'Meijia', 'Hanhan', 'Yating', 'Google 國語', '臺灣', 'Taiwan', 'zh-TW', 'zh_TW'];
+        selectedVoice = availableVoices.find(v => (v.lang === 'zh-TW' || v.lang === 'zh_TW' || v.lang === 'cmn-Hant-TW') && twKeywords.some(k => v.name.includes(k))) ||
+            availableVoices.find(v => v.lang === 'zh-TW' || v.lang === 'zh_TW' || v.lang === 'cmn-Hant-TW') ||
+            availableVoices.find(v => v.lang.startsWith('zh') && twKeywords.some(k => v.name.includes(k))) ||
+            availableVoices.find(v => v.lang.startsWith('zh'));
+    } else {
+        const enKeywords = ['Samantha', 'Zira', 'Google US English', 'en-US'];
+        selectedVoice = availableVoices.find(v => v.lang.startsWith('en') && enKeywords.some(k => v.name.includes(k))) ||
+            availableVoices.find(v => v.lang.startsWith('en'));
+    }
 
     if (selectedVoice) currentUtterance.voice = selectedVoice;
 
-    // Harmonized parameters for both languages as requested
-    if (lang === 'zh-TW') {
-        currentUtterance.rate = 0.9;
-        currentUtterance.pitch = 0.85;
-    } else {
-        // Updated English to match female parameters and speed
-        currentUtterance.rate = 0.9;
-        currentUtterance.pitch = 0.85;
-    }
+    // Natural clarity parameters (rate: 0.95, pitch: 1.0)
+    currentUtterance.rate = 0.95;
+    currentUtterance.pitch = 1.0;
 
     currentUtterance.onend = () => {
         voiceQueueIndex++;
