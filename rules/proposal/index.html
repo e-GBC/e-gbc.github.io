@@ -622,64 +622,81 @@
       {
         id: 'rules-identity',
         category: '2027 借用原則 (一)',
-        title: 'Q1：如何區分內外部事工？',
+        title: 'Q1：如何區分內外部事工與收費界線？',
         render: () => `
-          <div class="space-y-6 sm:space-y-8 w-full text-left">
+          <div class="space-y-4 sm:space-y-5 w-full text-left">
             <div>
               <span class="text-sm font-black text-blue-400 tracking-widest uppercase">SECTION 07 - 2027 原則 (一)</span>
-              <h2 class="text-3xl sm:text-5xl font-black text-white mt-1">Q1：如何區分內外部事工？</h2>
-              <p class="text-lg text-slate-400 mt-2 font-medium">當借用者都希望免費使用場地時，行政判定的準則是「是否有同工」</p>
+              <h2 class="text-3xl sm:text-5xl font-black text-white mt-1">Q1：如何區分內外部事工與收費界線？</h2>
+              <p class="text-base sm:text-lg text-slate-400 mt-1.5 font-medium">前提：全堂借用均需教牧遮蓋；行政判定的關鍵為「是否有同工群」</p>
             </div>
-            <div class="space-y-3.5 sm:space-y-4 text-base sm:text-lg w-full">
+            <div class="space-y-3 sm:space-y-3.5 w-full">
               <!-- 1. 內部事工（主視覺卡片） -->
-              <div class="p-5 sm:p-6 rounded-2xl bg-blue-950/40 border-2 border-blue-600/90 shadow-lg shadow-blue-950/30 space-y-2">
+              <div class="p-4 sm:p-5 rounded-2xl bg-blue-950/40 border-2 border-blue-600/90 shadow-lg shadow-blue-950/30 space-y-1.5">
                 <div class="flex flex-wrap items-center justify-between gap-2">
                   <div class="flex items-center gap-2">
                     <span class="text-2xl">⛪</span>
-                    <h3 class="text-xl sm:text-2xl font-black text-white">內部事工（懷恩堂主辦）</h3>
+                    <h3 class="text-lg sm:text-xl font-black text-white">內部事工（懷恩堂主辦）</h3>
                   </div>
                   <div class="flex items-center gap-1.5">
                     <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">全額免費</span>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-blue-500/20 text-blue-300 border border-blue-500/40">全力宣傳</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-blue-500/20 text-blue-300 border border-blue-500/40">行政全力支援</span>
                   </div>
                 </div>
-                <p class="text-slate-200 leading-relaxed font-medium">
-                  由懷恩堂教牧或核心團隊主辦，為行政優先支援對象。享全額免費，並提供官網與 LINE 官方帳號數位宣傳。
+                <p class="text-slate-200 text-sm sm:text-base leading-relaxed font-medium">
+                  經執事會通過之年度事工，由各執事單位組推動，具備核心同工群。享全額免費，行政同工優先常駐支援。
                 </p>
               </div>
 
-              <!-- 2. 本堂會友借用（次要視覺卡片） -->
-              <div class="p-5 sm:p-6 rounded-2xl bg-slate-850/80 border-2 border-slate-700/80 space-y-2">
+              <!-- 2. 本堂會友借用 / 協辦事工（次要視覺卡片） -->
+              <div class="p-4 sm:p-5 rounded-2xl bg-slate-850/80 border-2 border-slate-700/80 space-y-2">
                 <div class="flex flex-wrap items-center justify-between gap-2">
                   <div class="flex items-center gap-2">
                     <span class="text-2xl">👤</span>
-                    <h3 class="text-xl sm:text-2xl font-black text-white">本堂會友借用（協辦）</h3>
+                    <h3 class="text-lg sm:text-xl font-black text-white">會友實質借用 / 協辦事工</h3>
                   </div>
                   <div class="flex items-center gap-1.5">
                     <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/40">專屬減免</span>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-slate-700 text-slate-300 border border-slate-600">週報宣傳</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-slate-700 text-slate-300 border border-slate-600">同工自主運作</span>
                   </div>
                 </div>
-                <p class="text-slate-300 leading-relaxed font-medium">
-                  由本堂會友發起並組建現場同工群。熟悉場地規範，當天行政無須常駐支援，故享會友專屬費用減免與週報宣傳。
-                </p>
+                <div class="text-slate-300 text-xs sm:text-sm leading-relaxed font-medium space-y-1">
+                  <div>
+                    <strong class="text-amber-300">・會友實質參與（拒絕人情掛名）：</strong>主要活動方為會友（婚喪禮拜，行政同工支援）、主禮為本堂牧者、核心執行為本堂神學生/宣教士、活動對象多為會友（如廣場市集）。
+                  </div>
+                  <div>
+                    <strong class="text-slate-200">・協辦專案（非會友發起）：</strong>能動員組建本堂同工群支援者，享減免優惠；現場同工自理，行政僅技術對接。
+                  </div>
+                </div>
               </div>
 
-              <!-- 3. 外部事工（警示/限制感卡片） -->
-              <div class="p-5 sm:p-6 rounded-2xl bg-amber-950/30 border-2 border-amber-800/80 space-y-2">
+              <!-- 3. 一般外部借用（標準收費卡片） -->
+              <div class="p-4 sm:p-5 rounded-2xl bg-amber-950/25 border-2 border-amber-800/70 space-y-1.5">
                 <div class="flex flex-wrap items-center justify-between gap-2">
                   <div class="flex items-center gap-2">
                     <span class="text-2xl">🌐</span>
-                    <h3 class="text-xl sm:text-2xl font-black text-amber-300">外部事工（資格嚴格限縮）</h3>
+                    <h3 class="text-lg sm:text-xl font-black text-amber-300">一般外部借用（未具上述條件）</h3>
                   </div>
                   <div class="flex items-center gap-1.5">
                     <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-rose-500/20 text-rose-300 border border-rose-500/40">全額收費</span>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-900/40 text-amber-300 border border-amber-700">人力補貼</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-900/40 text-amber-300 border border-amber-700">自備同工</span>
                   </div>
                 </div>
-                <p class="text-slate-200 leading-relaxed font-medium">
-                  僅限大學里、神學院與基督教機構（需教牧遮蓋）。因缺乏現場同工，行政需全時段監管與支援，故依標準收費以補貼人力成本。
+                <p class="text-slate-200 text-sm sm:text-base leading-relaxed font-medium">
+                  非本堂會友發起且未具上述實質條件者。借用單位必須自備操作同工群，依標準收費補貼消耗，行政僅提供技術對接。
                 </p>
+              </div>
+
+              <!-- 4. 特殊合作白名單橫幅 -->
+              <div class="p-3.5 sm:p-4 rounded-xl bg-indigo-950/40 border border-indigo-700/60 text-indigo-200 text-xs sm:text-sm font-medium flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-xl">🏆</span>
+                  <div>
+                    <strong class="text-white">特殊夥伴白名單（浸信會神學院、周聯華牧師基金會）：</strong>
+                    <span>經教牧遮蓋全額免費；但借用單位<strong class="text-indigo-300">必須自備現場操作同工群</strong>，行政僅做前期技術對接。</span>
+                  </div>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 whitespace-nowrap">全額免費</span>
               </div>
             </div>
           </div>
