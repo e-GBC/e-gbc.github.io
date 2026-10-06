@@ -511,65 +511,65 @@
       },
       {
         id: 'market-comparison',
-        category: '市場行情比對',
-        title: '與大安區同型場地行情對比',
+        category: '費率依據參照',
+        title: '費率參照依據：同型專業場地對照',
         render: () => `
-          <div class="space-y-6">
+          <div class="space-y-4 sm:space-y-5">
             <div>
-              <span class="text-sm font-black text-purple-400 tracking-widest uppercase">SECTION 06 - 市場行情</span>
-              <h2 class="text-3xl sm:text-5xl font-black text-white mt-1">與大安區同型場地行情對比</h2>
+              <span class="text-sm font-black text-purple-400 tracking-widest uppercase">SECTION 06 - 費率依據</span>
+              <h2 class="text-2xl sm:text-4xl font-black text-white mt-1">費率參照依據：同型專業活動場地</h2>
             </div>
 
             <div class="overflow-x-auto rounded-2xl border-2 border-slate-700 bg-slate-900/80">
               <table class="w-full text-left text-xs sm:text-base">
                 <thead class="bg-slate-800 text-slate-200 font-bold border-b border-slate-700">
                   <tr>
-                    <th class="p-3.5 sm:p-5">場地名稱與地點</th>
-                    <th class="p-3.5 sm:p-5">大堂 / 禮堂時段費</th>
-                    <th class="p-3.5 sm:p-5">中型場地時段費</th>
-                    <th class="p-3.5 sm:p-5">一般教室時段費</th>
+                    <th class="py-2.5 px-3.5 sm:py-3 sm:px-4">場地名稱與地點</th>
+                    <th class="py-2.5 px-3.5 sm:py-3 sm:px-4">大堂 / 禮堂時段費</th>
+                    <th class="py-2.5 px-3.5 sm:py-3 sm:px-4">中型場地時段費</th>
+                    <th class="py-2.5 px-3.5 sm:py-3 sm:px-4">一般教室時段費</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-800 text-slate-300 font-semibold">
                   <tr class="bg-blue-950/30 font-bold text-white border-l-4 border-blue-500">
-                    <td class="p-3.5 sm:p-5 text-blue-300 text-sm sm:text-lg">
-                      浸信會懷恩堂<br />
-                      <span class="text-xs sm:text-sm font-normal text-blue-300/80">(2026 新制)</span>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4 text-blue-300 text-sm sm:text-lg font-black">
+                      浸信會懷恩堂
                     </td>
-                    <td class="p-3.5 sm:p-5 text-emerald-400">NT$ 30,000 / 10,000</td>
-                    <td class="p-3.5 sm:p-5 text-emerald-400">NT$ 10,000 / 5,000</td>
-                    <td class="p-3.5 sm:p-5">500 ~ 1,000 (長期)</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4 text-emerald-400 font-bold">NT$ 30,000 / 10,000</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4 text-emerald-400 font-bold">NT$ 10,000 / 5,000</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4">500 ~ 1,000 (長期)</td>
                   </tr>
                   <tr>
-                    <td class="p-3.5 sm:p-5 text-white">耕莘文教院 (辛亥路一段)</td>
-                    <td class="p-3.5 sm:p-5">NT$ 32,000 ～ 45,000</td>
-                    <td class="p-3.5 sm:p-5">NT$ 12,000 ～ 18,000</td>
-                    <td class="p-3.5 sm:p-5">NT$ 2,500 ～ 4,000</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4 text-white">耕莘文教院 (辛亥路一段)</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4">NT$ 32,000 ～ 45,000</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4">NT$ 12,000 ～ 18,000</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4">NT$ 2,500 ～ 4,000</td>
                   </tr>
                   <tr>
-                    <td class="p-3.5 sm:p-5 text-white">公務人力發展中心 (福華文教會館)</td>
-                    <td class="p-3.5 sm:p-5">NT$ 42,000 ～ 68,000</td>
-                    <td class="p-3.5 sm:p-5">NT$ 16,000 ～ 26,000</td>
-                    <td class="p-3.5 sm:p-5">NT$ 4,500 ～ 8,500</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4 text-white">公務人力發展中心 (福華委外經營)</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4">NT$ 42,000 ～ 68,000</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4">NT$ 16,000 ～ 26,000</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4">NT$ 4,500 ～ 8,500</td>
                   </tr>
                   <tr>
-                    <td class="p-3.5 sm:p-5 text-white">台北真理堂 (新生南路旁)</td>
-                    <td class="p-3.5 sm:p-5">NT$ 35,000 ～ 50,000</td>
-                    <td class="p-3.5 sm:p-5">NT$ 12,000 ～ 20,000</td>
-                    <td class="p-3.5 sm:p-5">NT$ 2,000 ～ 4,500</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4 text-white">台北真理堂 (新生南路旁)</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4">NT$ 35,000 ～ 50,000</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4">NT$ 12,000 ～ 20,000</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4">NT$ 2,000 ～ 4,500</td>
                   </tr>
                   <tr>
-                    <td class="p-3.5 sm:p-5 text-white">集思台大會議中心 (羅斯福路)</td>
-                    <td class="p-3.5 sm:p-5">NT$ 45,000 ～ 85,000</td>
-                    <td class="p-3.5 sm:p-5">NT$ 18,000 ～ 35,000</td>
-                    <td class="p-3.5 sm:p-5">NT$ 5,000 ～ 10,000</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4 text-white">集思台大會議中心 (羅斯福路)</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4">NT$ 45,000 ～ 85,000</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4">NT$ 18,000 ～ 35,000</td>
+                    <td class="py-2.5 px-3.5 sm:py-3 sm:px-4">NT$ 5,000 ～ 10,000</td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
-            <div class="p-4 bg-slate-800/80 rounded-2xl border border-slate-700 text-xs sm:text-sm text-slate-300 leading-relaxed">
-              📌 備註： 同型場地之投影機、音響專用人員等多為額外加收項目；懷恩堂為單一時段全包制（含冷氣、投影與附屬休息室，不另收設備費）。
+            <div class="p-3.5 sm:p-4 bg-slate-800/80 rounded-2xl border border-slate-700 text-xs sm:text-sm text-slate-300 leading-relaxed space-y-1">
+              <div><strong class="text-amber-300">📌 功能差異：</strong>公有區民活動中心（時段費數百至千元）僅提供空屋無專業影音，無法承辦音樂會與論壇，故不列入參照。</div>
+              <div><strong class="text-blue-300">📌 全包防線：</strong>外部同型專業場館時段費多為 3.5～8 萬（設備多需額外加收）；本堂採全包制且定價克制，僅為建立健康防線。</div>
             </div>
           </div>
         `
