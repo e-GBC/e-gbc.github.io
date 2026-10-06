@@ -33,68 +33,50 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
-        <button
-          onclick="window.print()"
-          class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-colors"
-        >
-          🖨️ 匯出 PDF
-        </button>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <span id="slide-category" class="text-xs uppercase font-bold text-slate-400 tracking-wider hidden sm:inline">
+          執事會審查提案
+        </span>
+        <span id="slide-counter" class="text-xs sm:text-sm font-black text-blue-400 bg-blue-950/70 px-3 py-1 rounded-lg border border-blue-800/80 font-mono tracking-wider">
+          PAGE 01 / 19
+        </span>
       </div>
     </div>
   </nav>
 
   <!-- 主簡報內容區塊 -->
-  <main class="flex-1 flex flex-col justify-between max-w-6xl mx-auto w-full p-4 sm:p-8">
-    <!-- 進度條與下拉跳頁 -->
-    <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3 no-print">
-      <div class="flex items-center gap-3">
-        <span id="slide-counter" class="text-sm font-black text-blue-400 bg-blue-950/70 px-3 py-1 rounded-lg border border-blue-800/80 font-mono tracking-wider">
-          PAGE 01 / 19
-        </span>
-        <span id="slide-category" class="text-xs uppercase font-bold text-slate-400 tracking-wider hidden sm:inline">
-          執事會審查提案
-        </span>
-      </div>
-
-      <select
-        id="slide-select"
-        onchange="goToSlide(Number(this.value))"
-        class="bg-slate-900 border border-slate-700 text-xs sm:text-sm text-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:border-blue-500 font-semibold"
-      >
-        <!-- Options generated dynamically -->
-      </select>
-    </div>
-
-    <!-- 投影片畫布容器 -->
-    <div id="slide-viewport" class="bg-slate-900/95 border-2 border-slate-800/90 rounded-3xl p-6 sm:p-12 shadow-2xl flex-1 flex flex-col justify-center min-h-[580px] relative overflow-hidden slide-card">
+  <main class="flex-1 flex flex-col max-w-6xl mx-auto w-full p-4 sm:p-8 pb-28 sm:pb-32">
+    <!-- 投影片畫布容器 (標題固定左上置頂) -->
+    <div id="slide-viewport" class="bg-slate-900/95 border-2 border-slate-800/90 rounded-3xl p-6 sm:p-12 shadow-2xl flex-1 flex flex-col justify-start items-start min-h-[580px] relative overflow-hidden slide-card w-full text-left">
       <!-- Slide Content injected via JavaScript -->
     </div>
+  </main>
 
-    <!-- 簡報底部控制器 -->
-    <div class="flex items-center justify-between mt-6 pt-4 border-t border-slate-800 no-print">
+  <!-- 簡報固定底部控制器 (Footer) -->
+  <footer class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 z-40 px-4 sm:px-8 py-3.5 no-print">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
       <button
         id="prev-btn"
         onclick="prevSlide()"
-        class="px-5 sm:px-8 py-3 rounded-2xl text-sm sm:text-base font-black flex items-center gap-2 border transition-all border-slate-700 text-slate-200 bg-slate-850 hover:bg-slate-800 active:scale-95 shadow-md"
+        class="px-5 sm:px-7 py-2.5 rounded-2xl text-xs sm:text-sm font-black flex items-center gap-2 border transition-all border-slate-700 text-slate-200 bg-slate-850 hover:bg-slate-800 active:scale-95 shadow-md"
       >
         ◀ 上一頁 (Left)
       </button>
 
       <!-- 頁籤指示器 -->
-      <div id="dot-indicators" class="hidden lg:flex items-center gap-1.5 max-w-md overflow-x-auto py-1">
+      <div id="dot-indicators" class="hidden sm:flex items-center gap-1.5 max-w-md overflow-x-auto py-1">
         <!-- Dots injected dynamically -->
       </div>
 
       <button
         id="next-btn"
         onclick="nextSlide()"
-        class="px-5 sm:px-8 py-3 rounded-2xl text-sm sm:text-base font-black flex items-center gap-2 border transition-all bg-blue-600 border-blue-500 text-white hover:bg-blue-500 shadow-lg active:scale-95"
+        class="px-5 sm:px-7 py-2.5 rounded-2xl text-xs sm:text-sm font-black flex items-center gap-2 border transition-all bg-blue-600 border-blue-500 text-white hover:bg-blue-500 shadow-lg active:scale-95"
       >
         下一頁 (Right / Space) ▶
       </button>
     </div>
-  </main>
+  </footer>
 
   <!-- 圖片燈箱 Modal -->
   <div id="image-modal" onclick="closeImageModal()" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden items-center justify-center p-4 cursor-pointer">
@@ -136,18 +118,18 @@
         category: '提案核心精神',
         title: '本次報告四大核心方針',
         render: () => `
-          <div class="space-y-8">
-            <div>
+          <div class="space-y-8 w-full">
+            <div class="text-center flex flex-col items-center justify-center">
               <span class="text-sm font-black text-blue-400 tracking-widest uppercase">SECTION 01</span>
               <h2 class="text-3xl sm:text-5xl font-black text-white mt-1">本次報告四大核心方針</h2>
               <p class="text-lg text-slate-400 mt-2 font-medium">制度建立的四大基本出發點</p>
             </div>
             <div class="grid sm:grid-cols-2 gap-6">
               <div class="p-6 rounded-2xl bg-blue-950/40 border border-blue-800/70 space-y-2">
-                <div class="text-3xl">🛡️</div>
-                <h3 class="text-2xl font-black text-white">一、場地管理必須收費</h3>
+                <div class="text-3xl">💎</div>
+                <h3 class="text-2xl font-black text-white">一、資源有價・品質深化</h3>
                 <p class="text-base text-slate-300 leading-relaxed font-medium">
-                  建立合理使用門檻，阻絕無約束的隨意詢問，健全場地管理秩序。
+                  免費容易導致資源被輕忽。適度收費能建立資源使用的敬虔與重視，確保各事工在申請前皆已完成充份規劃，共同維護高品質的聚會環境。
                 </p>
               </div>
               <div class="p-6 rounded-2xl bg-emerald-950/40 border border-emerald-800/70 space-y-2">
@@ -219,63 +201,95 @@
         `
       },
       {
-        id: 'data-alert',
-        category: '數據警訊',
-        title: '警訊：外部活動佔據主日外場地 1/4',
-        render: () => `
-          <div class="space-y-8 text-center flex flex-col items-center justify-center">
-            <span class="text-sm font-black text-rose-400 tracking-widest uppercase bg-rose-950/60 px-4 py-1.5 rounded-full border border-rose-800">
-              CRITICAL DATA ALERT
-            </span>
-            <div class="text-7xl sm:text-9xl font-black text-rose-500 font-mono tracking-tight animate-pulse">
-              25%
-            </div>
-            <h2 class="text-3xl sm:text-5xl font-black text-white max-w-4xl leading-snug">
-              外部活動已佔據教會主日外場地的 1/4
-            </h2>
-            <p class="text-xl sm:text-3xl text-slate-200 max-w-3xl font-bold leading-relaxed border-t border-slate-800 pt-6">
-              過多外部活動造成內部牧養事工、敬拜訓練無空間可運用
-            </p>
-          </div>
-        `
-      },
-      {
         id: 'problems-external',
         category: '面臨問題 (外部)',
         title: '外部困擾：溝通成本龐大',
         render: () => `
-          <div class="space-y-8">
+          <div class="space-y-8 w-full text-left">
             <div>
               <span class="text-sm font-black text-rose-400 tracking-widest uppercase">SECTION 03 - 外部困擾</span>
               <h2 class="text-3xl sm:text-5xl font-black text-white mt-1">外部困擾：溝通成本龐大</h2>
               <p class="text-lg text-slate-400 mt-2 font-medium">場務同工持續扮演黑臉，急需法規作為擋箭牌</p>
             </div>
-            <div class="grid sm:grid-cols-2 gap-6 text-base sm:text-lg">
-              <div class="p-6 rounded-2xl bg-rose-950/30 border border-rose-900/60 space-y-2">
-                <div class="text-2xl sm:text-3xl text-rose-400 font-bold">📞 每月逾 5 件新詢問</div>
-                <p class="text-slate-300 leading-relaxed font-medium">
-                  單月常有超過 5 件以上新單位來電詢問，即使依序回絕也要耗費極大人力與時間做溝通說明。
-                </p>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-5 relative items-stretch">
+              <!-- Step 1 -->
+              <div class="p-6 sm:p-7 rounded-3xl bg-slate-850/90 border-2 border-slate-700/80 flex flex-col justify-between min-h-[360px] sm:min-h-[400px] shadow-xl relative group">
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between border-b border-slate-700/60 pb-3">
+                    <span class="text-sm font-black px-2.5 py-1 rounded-lg bg-blue-950 text-blue-300 border border-blue-800 font-mono">01</span>
+                    <span class="text-slate-500 font-black text-lg hidden md:inline">➔</span>
+                  </div>
+                  <h3 class="text-xl sm:text-2xl font-black text-white">大量外部詢問</h3>
+                  <p class="text-base sm:text-lg text-slate-300 leading-relaxed font-medium">
+                    每月超過 5 件外部借用，<br />
+                    行政窗口需耗費極大時間溝通回絕。
+                  </p>
+                </div>
               </div>
-              <div class="p-6 rounded-2xl bg-rose-950/30 border border-rose-900/60 space-y-2">
-                <div class="text-2xl sm:text-3xl text-rose-400 font-bold">🔁 人情轉介循環</div>
-                <p class="text-slate-300 leading-relaxed font-medium">
-                  外部單位在行政窗口被婉拒後，常轉而尋找熟悉的牧長、執事、甚至資深會友重複詢問。
-                </p>
+              <!-- Step 2 -->
+              <div class="p-6 sm:p-7 rounded-3xl bg-amber-950/30 border-2 border-amber-800/70 flex flex-col justify-between min-h-[360px] sm:min-h-[400px] shadow-xl relative group">
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between border-b border-amber-800/50 pb-3">
+                    <span class="text-sm font-black px-2.5 py-1 rounded-lg bg-amber-950 text-amber-300 border border-amber-800 font-mono">02</span>
+                    <span class="text-amber-500/70 font-black text-lg hidden md:inline">➔</span>
+                  </div>
+                  <h3 class="text-xl sm:text-2xl font-black text-white">轉向人情關說</h3>
+                  <p class="text-base sm:text-lg text-slate-300 leading-relaxed font-medium">
+                    被拒後轉找熟識牧長或資深會眾，<br />
+                    試圖透過人情重新申請。
+                  </p>
+                </div>
               </div>
-              <div class="p-6 rounded-2xl bg-rose-950/30 border border-rose-900/60 space-y-2">
-                <div class="text-2xl sm:text-3xl text-rose-400 font-bold">🎭 同工持續扮演黑臉</div>
-                <p class="text-slate-300 leading-relaxed font-medium">
-                  同工長期在第一線承擔拒絕人的心理壓力，極度需要一套不可動搖的制度「令劍」作為後盾。
-                </p>
+              <!-- Step 3 -->
+              <div class="p-6 sm:p-7 rounded-3xl bg-rose-950/40 border-2 border-rose-800/80 flex flex-col justify-between min-h-[360px] sm:min-h-[400px] shadow-xl relative group">
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between border-b border-rose-800/50 pb-3">
+                    <span class="text-sm font-black px-2.5 py-1 rounded-lg bg-rose-950 text-rose-300 border border-rose-800 font-mono">03</span>
+                    <span class="text-rose-500/70 font-black text-lg hidden md:inline">➔</span>
+                  </div>
+                  <h3 class="text-xl sm:text-2xl font-black text-white">同工獨自扛壓</h3>
+                  <p class="text-base sm:text-lg text-slate-300 leading-relaxed font-medium">
+                    第一線場務缺乏明確規範，<br />
+                    只能持續扮演黑臉承擔壓力。
+                  </p>
+                </div>
               </div>
-              <div class="p-6 rounded-2xl bg-rose-950/30 border border-rose-900/60 space-y-2">
-                <div class="text-2xl sm:text-3xl text-rose-400 font-bold">🚪 人情推不掉的惡果</div>
-                <p class="text-slate-300 leading-relaxed font-medium">
-                  一旦人情壓力推不掉而破例借出，實質佔據的都是本該保留給教會自身事工發展的空間。
-                </p>
+              <!-- Step 4 -->
+              <div class="p-6 sm:p-7 rounded-3xl bg-red-950/80 border-2 border-red-600 flex flex-col justify-between min-h-[360px] sm:min-h-[400px] shadow-2xl shadow-red-950/50 relative">
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between border-b border-red-800/60 pb-3">
+                    <span class="text-sm font-black px-2.5 py-1 rounded-lg bg-red-900 text-red-200 border border-red-700 font-mono">04</span>
+                    <span class="text-xs text-red-300 font-bold bg-red-900/60 px-2 py-0.5 rounded-full border border-red-700">💥 最終惡果</span>
+                  </div>
+                  <h3 class="text-xl sm:text-2xl font-black text-white">破例擠壓事工</h3>
+                  <p class="text-base sm:text-lg text-red-100 leading-relaxed font-medium">
+                    最終因人情壓力破例借出，<br />
+                    直接侵佔教會自有的事工發展空間。
+                  </p>
+                </div>
               </div>
             </div>
+          </div>
+        `
+      },
+      {
+        id: 'data-alert',
+        category: '數據警訊',
+        title: '警訊：外部活動佔據主日外場地 1/4',
+        render: () => `
+          <div class="space-y-6 w-full text-center flex flex-col items-center justify-center py-6">
+            <span class="inline-block text-sm font-black text-rose-400 tracking-widest uppercase bg-rose-950/60 px-4 py-1.5 rounded-full border border-rose-800">
+              CRITICAL DATA ALERT
+            </span>
+            <div class="text-8xl sm:text-9xl font-black text-rose-500 font-mono tracking-tight animate-pulse my-2">
+              25%
+            </div>
+            <h2 class="text-3xl sm:text-5xl font-black text-white max-w-4xl leading-snug">
+              外部活動已佔據教會主日外場地的 1/4
+            </h2>
+            <p class="text-xl sm:text-2xl text-slate-200 max-w-3xl font-bold leading-relaxed border-t border-slate-800 pt-6">
+              過多外部活動造成內部牧養事工、敬拜訓練無空間可運用
+            </p>
           </div>
         `
       },
@@ -284,36 +298,68 @@
         category: '面臨問題 (內部)',
         title: '內部危機：事工空間被佔與同工過勞',
         render: () => `
-          <div class="space-y-8">
+          <div class="space-y-8 w-full text-left">
             <div>
               <span class="text-sm font-black text-rose-400 tracking-widest uppercase">SECTION 03 - 內部危機</span>
               <h2 class="text-3xl sm:text-5xl font-black text-white mt-1">內部危機：事工空間被佔與同工過勞</h2>
               <p class="text-lg text-slate-400 mt-2 font-medium">空間吃緊＋出勤過度＝面臨嚴重的同工離職潮 (Burnout)</p>
             </div>
-            <div class="grid sm:grid-cols-2 gap-6 text-base sm:text-lg">
-              <div class="p-6 rounded-2xl bg-slate-800/90 border border-slate-700 space-y-2">
-                <div class="text-2xl sm:text-3xl text-amber-400 font-bold">🚪 邊間教室僅剩 3 間彈性</div>
-                <p class="text-slate-300 leading-relaxed font-medium">
-                  週間晚上具備空調的功能教室多僅剩 3 個彈性空間；敬拜練習、團契時常被迫調動，無法排入週間新事工。
-                </p>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-5 relative items-stretch">
+              <!-- Step 1 -->
+              <div class="p-6 sm:p-7 rounded-3xl bg-slate-850/90 border-2 border-slate-700/80 flex flex-col justify-between min-h-[360px] sm:min-h-[400px] shadow-xl relative group">
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between border-b border-slate-700/60 pb-3">
+                    <span class="text-sm font-black px-2.5 py-1 rounded-lg bg-amber-950 text-amber-300 border border-amber-800 font-mono">01</span>
+                    <span class="text-slate-500 font-black text-lg hidden md:inline">➔</span>
+                  </div>
+                  <h3 class="text-xl sm:text-2xl font-black text-white">內部空間吃緊</h3>
+                  <p class="text-base sm:text-lg text-slate-300 leading-relaxed font-medium">
+                    週間晚間僅剩 3 間可用教室，<br />
+                    自家敬拜與團契被迫頻繁調動。
+                  </p>
+                </div>
               </div>
-              <div class="p-6 rounded-2xl bg-slate-800/90 border border-slate-700 space-y-2">
-                <div class="text-2xl sm:text-3xl text-amber-400 font-bold">🛠️ 行政量能全為外部服務</div>
-                <p class="text-slate-300 leading-relaxed font-medium">
-                  外部多需現勘、技術對接與全時段支援，同工平日與修繕資源幾乎都被外部綁架，無心力優化既有行政流程。
-                </p>
+              <!-- Step 2 -->
+              <div class="p-6 sm:p-7 rounded-3xl bg-amber-950/30 border-2 border-amber-800/70 flex flex-col justify-between min-h-[360px] sm:min-h-[400px] shadow-xl relative group">
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between border-b border-amber-800/50 pb-3">
+                    <span class="text-sm font-black px-2.5 py-1 rounded-lg bg-amber-950 text-amber-300 border border-amber-800 font-mono">02</span>
+                    <span class="text-amber-500/70 font-black text-lg hidden md:inline">➔</span>
+                  </div>
+                  <h3 class="text-xl sm:text-2xl font-black text-white">量能全被綁架</h3>
+                  <p class="text-base sm:text-lg text-slate-300 leading-relaxed font-medium">
+                    行政與修繕資源全投入支援外部現勘，<br />
+                    無法優化內部流程。
+                  </p>
+                </div>
               </div>
-              <div class="p-6 rounded-2xl bg-rose-950/40 border border-rose-900 space-y-2">
-                <div class="text-2xl sm:text-3xl text-rose-400 font-bold">⏳ 每兩週即需六天出勤</div>
-                <p class="text-slate-300 leading-relaxed font-medium">
-                  第一線場務同工時常面臨每兩週就要出勤六天之高壓現況，無法享有正常的家庭與休息時間。
-                </p>
+              <!-- Step 3 -->
+              <div class="p-6 sm:p-7 rounded-3xl bg-rose-950/40 border-2 border-rose-800/80 flex flex-col justify-between min-h-[360px] sm:min-h-[400px] shadow-xl relative group">
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between border-b border-rose-800/50 pb-3">
+                    <span class="text-sm font-black px-2.5 py-1 rounded-lg bg-rose-950 text-rose-300 border border-rose-800 font-mono">03</span>
+                    <span class="text-rose-500/70 font-black text-lg hidden md:inline">➔</span>
+                  </div>
+                  <h3 class="text-xl sm:text-2xl font-black text-white">同工頻繁過勞</h3>
+                  <p class="text-base sm:text-lg text-slate-300 leading-relaxed font-medium">
+                    場務每兩週即需出勤六天，<br />
+                    無法享有正常的家庭與休息時間。
+                  </p>
+                </div>
               </div>
-              <div class="p-6 rounded-2xl bg-rose-950/40 border border-rose-900 space-y-2">
-                <div class="text-2xl sm:text-3xl text-rose-400 font-bold">💥 過勞請求代禱或離職</div>
-                <p class="text-slate-300 leading-relaxed font-medium">
-                  長期的身心過載（Burnout），最後的結果往往就是只能請求代禱、或者直接身心俱疲選擇離職。
-                </p>
+              <!-- Step 4 -->
+              <div class="p-6 sm:p-7 rounded-3xl bg-red-950/80 border-2 border-red-600 flex flex-col justify-between min-h-[360px] sm:min-h-[400px] shadow-2xl shadow-red-950/50 relative">
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between border-b border-red-800/60 pb-3">
+                    <span class="text-sm font-black px-2.5 py-1 rounded-lg bg-red-900 text-red-200 border border-red-700 font-mono">04</span>
+                    <span class="text-xs text-red-300 font-bold bg-red-900/60 px-2 py-0.5 rounded-full border border-red-700">💥 最終惡果</span>
+                  </div>
+                  <h3 class="text-xl sm:text-2xl font-black text-white">引發離職危機</h3>
+                  <p class="text-base sm:text-lg text-red-100 leading-relaxed font-medium">
+                    長期身心俱疲（Burnout），<br />
+                    最終只能請求代禱或選擇離職。
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -466,13 +512,12 @@
       {
         id: 'market-comparison',
         category: '市場行情比對',
-        title: '大安區與台北市同型場地行情對比',
+        title: '與大安區同型場地行情對比',
         render: () => `
           <div class="space-y-6">
             <div>
               <span class="text-sm font-black text-purple-400 tracking-widest uppercase">SECTION 06 - 市場行情</span>
-              <h2 class="text-2xl sm:text-4xl font-black text-white mt-1">大安區與台北市同型場地行情對比</h2>
-              <p class="text-base text-slate-400 mt-1">明確比對耕莘文教院、公務人力、台北真理堂與集思台大</p>
+              <h2 class="text-3xl sm:text-5xl font-black text-white mt-1">與大安區同型場地行情對比</h2>
             </div>
 
             <div class="overflow-x-auto rounded-2xl border-2 border-slate-700 bg-slate-900/80">
@@ -524,8 +569,7 @@
             </div>
 
             <div class="p-4 bg-slate-800/80 rounded-2xl border border-slate-700 text-xs sm:text-sm text-slate-300 leading-relaxed">
-              <strong>📌 設備加成備註：</strong>
-              其他場地之投影機（約 2,000～3,500 元/段）、音響專用人員及空調皆為額外加收項目；懷恩堂為單一時段全包制（內含冷氣、投影與附屬休息室，不另收設備費）。
+              📌 備註： 同型場地之投影機、音響專用人員等多為額外加收項目；懷恩堂為單一時段全包制（含冷氣、投影與附屬休息室，不另收設備費）。
             </div>
           </div>
         `
@@ -535,32 +579,40 @@
         category: '市場定位結論',
         title: '市場對比結論：合理定價建立防線',
         render: () => `
-          <div class="space-y-8">
+          <div class="space-y-8 w-full text-left">
             <div>
               <span class="text-sm font-black text-purple-400 tracking-widest uppercase">SECTION 06 - 定位結論</span>
               <h2 class="text-3xl sm:text-5xl font-black text-white mt-1">市場對比結論：合理定價建立防線</h2>
               <p class="text-lg text-slate-400 mt-2 font-medium">既維護國度宣教之初心，亦兼顧教會資源之永續健全</p>
             </div>
-            <div class="grid md:grid-cols-3 gap-6 text-base sm:text-xl">
-              <div class="p-6 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-3">
-                <div class="text-3xl">🕊️</div>
-                <h3 class="text-2xl font-black text-emerald-400">遠低於商業市場</h3>
-                <p class="text-slate-300 leading-relaxed font-medium">
-                  懷恩堂大堂 30,000 元（會友僅 10,000 元），遠低於商業與政府場館的 4.5 萬至 8.5 萬元，展現教會的恩典與友好。
+            <div class="space-y-4 sm:space-y-5 text-base sm:text-xl w-full">
+              <div class="p-5 sm:p-6 rounded-2xl bg-emerald-950/30 border-2 border-emerald-800/70 space-y-1.5">
+                <div class="flex items-center gap-3">
+                  <span class="text-2xl sm:text-3xl">🕊️</span>
+                  <h3 class="text-xl sm:text-2xl font-black text-emerald-300">一、遠低於商業市場</h3>
+                </div>
+                <p class="text-slate-200 leading-relaxed font-medium text-base sm:text-lg">
+                  遠低於外部場館費用，展現友好與非營利精神。
                 </p>
               </div>
-              <div class="p-6 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-3">
-                <div class="text-3xl">🛡️</div>
-                <h3 class="text-2xl font-black text-blue-400">有效過濾濫用詢問</h3>
-                <p class="text-slate-300 leading-relaxed font-medium">
-                  相較過去的「免費」或「自由奉獻」，新費率能形成合理的「過濾門檻」，讓真正有需要的單位按正規程序提出申請。
+
+              <div class="p-5 sm:p-6 rounded-2xl bg-blue-950/30 border-2 border-blue-800/70 space-y-1.5">
+                <div class="flex items-center gap-3">
+                  <span class="text-2xl sm:text-3xl">🛡️</span>
+                  <h3 class="text-xl sm:text-2xl font-black text-blue-300">二、有效過濾濫用詢問</h3>
+                </div>
+                <p class="text-slate-200 leading-relaxed font-medium text-base sm:text-lg">
+                  建立合理門檻，阻絕隨意詢問，落實正規申請。
                 </p>
               </div>
-              <div class="p-6 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-3">
-                <div class="text-3xl">📦</div>
-                <h3 class="text-2xl font-black text-amber-400">包套透明不加價</h3>
-                <p class="text-slate-300 leading-relaxed font-medium">
-                  其他場地皆逐項加收投影、音響與水電費；懷恩堂時段費全包，避免繁雜計算，行政溝通成本降至最低。
+
+              <div class="p-5 sm:p-6 rounded-2xl bg-slate-800/80 border-2 border-slate-700/80 space-y-1.5">
+                <div class="flex items-center gap-3">
+                  <span class="text-2xl sm:text-3xl">📦</span>
+                  <h3 class="text-xl sm:text-2xl font-black text-amber-300">三、包套透明不加價</h3>
+                </div>
+                <p class="text-slate-200 leading-relaxed font-medium text-base sm:text-lg">
+                  時段費已包含冷氣、投影音響與休息室，降低行政溝通成本。
                 </p>
               </div>
             </div>
@@ -570,42 +622,63 @@
       {
         id: 'rules-identity',
         category: '2027 借用原則 (一)',
-        title: '內部事工 vs 外部事工之界線',
+        title: 'Q1：如何區分內外部事工？',
         render: () => `
-          <div class="space-y-8">
+          <div class="space-y-6 sm:space-y-8 w-full text-left">
             <div>
               <span class="text-sm font-black text-blue-400 tracking-widest uppercase">SECTION 07 - 2027 原則 (一)</span>
-              <h2 class="text-3xl sm:text-5xl font-black text-white mt-1">內部事工 vs 外部事工之界線</h2>
-              <p class="text-lg text-slate-400 mt-2 font-medium">嚴格收斂外部對象，確保教會場地設立宗旨</p>
+              <h2 class="text-3xl sm:text-5xl font-black text-white mt-1">Q1：如何區分內外部事工？</h2>
+              <p class="text-lg text-slate-400 mt-2 font-medium">當借用者都希望免費使用場地時，行政判定的準則是「是否有同工」</p>
             </div>
-            <div class="space-y-5 text-base sm:text-xl">
-              <div class="p-6 rounded-2xl bg-amber-950/40 border-2 border-amber-800/80 space-y-2">
-                <div class="flex items-center gap-2">
-                  <span class="text-2xl">🌐</span>
-                  <h3 class="text-2xl font-black text-amber-300">外部事工（資格嚴格限縮）</h3>
+            <div class="space-y-3.5 sm:space-y-4 text-base sm:text-lg w-full">
+              <!-- 1. 內部事工（主視覺卡片） -->
+              <div class="p-5 sm:p-6 rounded-2xl bg-blue-950/40 border-2 border-blue-600/90 shadow-lg shadow-blue-950/30 space-y-2">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-2xl">⛪</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-white">內部事工（懷恩堂主辦）</h3>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">全額免費</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-blue-500/20 text-blue-300 border border-blue-500/40">全力宣傳</span>
+                  </div>
                 </div>
-                <p class="text-slate-100 leading-relaxed font-bold">
-                  僅為大學里、基督教機構、神學院服務。未曾合作單位需有教牧遮蓋。外部事工無同工人力，需現勘與行政人力直接支援，故而必須明確立定限制。
+                <p class="text-slate-200 leading-relaxed font-medium">
+                  由懷恩堂教牧或核心團隊主辦，為行政優先支援對象。享全額免費，並提供官網與 LINE 官方帳號數位宣傳。
                 </p>
               </div>
 
-              <div class="p-6 rounded-2xl bg-blue-950/40 border border-blue-800/70 space-y-2">
-                <div class="flex items-center gap-2">
-                  <span class="text-2xl">⛪</span>
-                  <h3 class="text-2xl font-black text-blue-300">內部事工（懷恩堂主辦）</h3>
+              <!-- 2. 本堂會友借用（次要視覺卡片） -->
+              <div class="p-5 sm:p-6 rounded-2xl bg-slate-850/80 border-2 border-slate-700/80 space-y-2">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-2xl">👤</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-white">本堂會友借用（協辦）</h3>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/40">專屬減免</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-slate-700 text-slate-300 border border-slate-600">週報宣傳</span>
+                  </div>
                 </div>
-                <p class="text-slate-200 leading-relaxed font-medium">
-                  由懷恩堂教牧同工或核心事工群主辦，行政與場務單位優先支援之核心對象。<strong>一律全額免費</strong>，並由行政單位主動提供官方網站與 LINE 官方帳號數位宣傳。
+                <p class="text-slate-300 leading-relaxed font-medium">
+                  由本堂會友發起並組建現場同工群。熟悉場地規範，當天行政無須常駐支援，故享會友專屬費用減免與週報宣傳。
                 </p>
               </div>
 
-              <div class="p-6 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-2">
-                <div class="flex items-center gap-2">
-                  <span class="text-2xl">👤</span>
-                  <h3 class="text-2xl font-black text-emerald-300">本堂會友借用</h3>
+              <!-- 3. 外部事工（警示/限制感卡片） -->
+              <div class="p-5 sm:p-6 rounded-2xl bg-amber-950/30 border-2 border-amber-800/80 space-y-2">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-2xl">🌐</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-amber-300">外部事工（資格嚴格限縮）</h3>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-rose-500/20 text-rose-300 border border-rose-500/40">全額收費</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-900/40 text-amber-300 border border-amber-700">人力補貼</span>
+                  </div>
                 </div>
                 <p class="text-slate-200 leading-relaxed font-medium">
-                  預設對本堂信仰準則與場地設備已有基本認識，支援負擔較低，故享有專屬會友費用減免。
+                  僅限大學里、神學院與基督教機構（需教牧遮蓋）。因缺乏現場同工，行政需全時段監管與支援，故依標準收費以補貼人力成本。
                 </p>
               </div>
             </div>
@@ -615,20 +688,20 @@
       {
         id: 'rules-schedule-matrix',
         category: '2027 借用原則 (二)',
-        title: '借用週期差異與防擠壓機制',
+        title: 'Q2：為什麼還有空間卻不允許借用？',
         render: () => `
           <div class="space-y-6">
             <div>
               <span class="text-sm font-black text-blue-400 tracking-widest uppercase">SECTION 07 - 2027 原則 (二)</span>
-              <h2 class="text-2xl sm:text-4xl font-black text-white mt-1">借用週期差異與防擠壓機制</h2>
-              <p class="text-base text-slate-400 mt-1">四大借用時序規範與防護防線</p>
+              <h2 class="text-3xl sm:text-5xl font-black text-white mt-1">Q2：為什麼還有空間卻不允許借用？</h2>
+              <p class="text-lg text-slate-400 mt-2 font-medium">行政判定的準則：必須事工→空間彈性→行政釋壓</p>
             </div>
 
             <div class="grid md:grid-cols-2 gap-5 text-sm sm:text-base">
               <div class="p-5 rounded-2xl bg-slate-800/80 border-2 border-slate-700 space-y-2">
-                <div class="flex items-center gap-2 text-rose-400 font-black text-lg">
-                  <span>🗓️</span>
-                  <h3>週一與國定假日不外借</h3>
+                <div class="flex items-center gap-2.5 text-rose-400 font-black text-xl sm:text-2xl">
+                  <span class="text-2xl sm:text-3xl">🗓️</span>
+                  <h3 class="text-xl sm:text-2xl">週一與國定假日不外借</h3>
                 </div>
                 <p class="text-slate-300 leading-relaxed font-medium">
                   週一為行政/教牧/清潔人力調度公休與機電修整日，非極特殊情況不外借。
@@ -636,9 +709,9 @@
               </div>
 
               <div class="p-5 rounded-2xl bg-slate-800/80 border-2 border-slate-700 space-y-2">
-                <div class="flex items-center gap-2 text-amber-400 font-black text-lg">
-                  <span>🛡️</span>
-                  <h3>週間邊間保留彈性</h3>
+                <div class="flex items-center gap-2.5 text-amber-400 font-black text-xl sm:text-2xl">
+                  <span class="text-2xl sm:text-3xl">🛡️</span>
+                  <h3 class="text-xl sm:text-2xl">週間邊間保留彈性</h3>
                 </div>
                 <p class="text-slate-300 leading-relaxed font-medium">
                   週間欠缺同工，行政技術支援難以即時，至少必須空下三間邊間教室（如 B06, 205, 301, 401）作為彈性緩衝。
@@ -646,9 +719,9 @@
               </div>
 
               <div class="p-5 rounded-2xl bg-slate-800/80 border-2 border-slate-700 space-y-2">
-                <div class="flex items-center gap-2 text-emerald-400 font-black text-lg">
-                  <span>📅</span>
-                  <h3>單次 / 臨時借用</h3>
+                <div class="flex items-center gap-2.5 text-emerald-400 font-black text-xl sm:text-2xl">
+                  <span class="text-2xl sm:text-3xl">📅</span>
+                  <h3 class="text-xl sm:text-2xl">單次 / 臨時借用</h3>
                 </div>
                 <ul class="text-slate-300 leading-relaxed font-medium space-y-1 list-disc pl-5 text-xs sm:text-sm">
                   <li>兩週外借用保留彈性，利於突發牧養使用。</li>
@@ -658,9 +731,9 @@
               </div>
 
               <div class="p-5 rounded-2xl bg-slate-800/80 border-2 border-slate-700 space-y-2">
-                <div class="flex items-center gap-2 text-purple-400 font-black text-lg">
-                  <span>🔒</span>
-                  <h3>長期借用需審慎評估</h3>
+                <div class="flex items-center gap-2.5 text-purple-400 font-black text-xl sm:text-2xl">
+                  <span class="text-2xl sm:text-3xl">🔒</span>
+                  <h3 class="text-xl sm:text-2xl">長期借用需審慎評估</h3>
                 </div>
                 <ul class="text-slate-300 leading-relaxed font-medium space-y-1 list-disc pl-5 text-xs sm:text-sm">
                   <li>週間功能教室低於 3 間時，一律不予外部長期借用。</li>
@@ -675,12 +748,12 @@
       {
         id: 'rules-parking',
         category: '2027 借用原則 (三)',
-        title: '停車場使用辦法：堅持公平・不予彈性',
+        title: 'Q3：還有車位為什麼不開放臨時停車？',
         render: () => `
           <div class="space-y-8">
             <div>
               <span class="text-sm font-black text-indigo-400 tracking-widest uppercase">SECTION 07 - 2027 原則 (三)</span>
-              <h2 class="text-3xl sm:text-5xl font-black text-white mt-1">停車場使用辦法：堅持公平・不予彈性</h2>
+              <h2 class="text-3xl sm:text-5xl font-black text-white mt-1">Q3：還有車位為什麼不開放臨時停車？</h2>
               <p class="text-lg text-slate-400 mt-2 font-medium">會友是依法付費申請停車證，絕不能慷會友之慨毫無節制開放外部免費停車</p>
             </div>
             <div class="grid sm:grid-cols-3 gap-6 text-base sm:text-lg">
@@ -688,7 +761,7 @@
                 <div class="text-3xl">🎫</div>
                 <h3 class="text-2xl font-black text-white">有停車證（會友）</h3>
                 <p class="text-slate-300 leading-relaxed font-medium">
-                  享有依規定進場停車之合法權利，符合活動資格者亦可提早申請保留。
+                  享有依規定進場停車之合法權利，活動當日提早前來即可使用非保留空位。
                 </p>
               </div>
               <div class="p-6 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-3">
@@ -719,7 +792,7 @@
         title: '新版辦法的核心目的',
         render: () => `
           <div class="space-y-8">
-            <div>
+            <div class="text-center flex flex-col items-center justify-center">
               <span class="text-sm font-black text-emerald-400 tracking-widest uppercase">SECTION 08 - 改革目的</span>
               <h2 class="text-3xl sm:text-5xl font-black text-white mt-1">新版辦法的核心目的</h2>
               <p class="text-lg text-slate-400 mt-2 font-medium">同工釋壓・一致規範・確保彈性空間</p>
@@ -747,11 +820,15 @@
                 <div class="w-12 h-12 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center font-black text-2xl">
                   3
                 </div>
-                <h3 class="text-2xl font-black text-white">確保彈性空間準則</h3>
+                <h3 class="text-2xl font-black text-white">確保新事工空間彈性</h3>
                 <p class="text-slate-300 leading-relaxed font-medium">
                   功能教室低於 3 間不借長期、週四邊間保留 3 間，確保內部敬拜團練習、團契與突發牧養事工隨時有充裕空間可用。
                 </p>
               </div>
+            </div>
+            <div class="p-4 sm:p-5 rounded-2xl bg-rose-950/40 border border-rose-800/80 text-rose-300 text-base sm:text-xl font-bold flex items-center justify-center gap-3 text-center">
+              <span>⚠️</span>
+              <span>場地管理辦法為基本原則，超出原則之特例需提請教牧會議</span>
             </div>
           </div>
         `
@@ -764,7 +841,7 @@
           <div class="space-y-8">
             <div>
               <span class="text-sm font-black text-rose-400 tracking-widest uppercase">SECTION 09 - 防身說帖 (一)</span>
-              <h2 class="text-2xl sm:text-4xl font-black text-white mt-1">
+              <h2 class="text-3xl sm:text-5xl font-black text-white mt-1 leading-tight">
                 情境一：「我們的活動必須要在週一週二，時間完全不能改！」
               </h2>
             </div>
@@ -773,7 +850,7 @@
                 <span>🎯</span> 官方標準回應說帖
               </div>
               <p class="text-xl sm:text-3xl text-white font-bold leading-relaxed">
-                「週一為全堂機電修繕與同工排定公休日，非極特殊專案恕不外借；若安排週二，因中央空調不啟動，僅能借用具獨立冷氣之邊間教室，且借用單位需具備能自主操作設備之同工。」
+                「週一及國定假日為全堂機電修繕與同工排定公休日，非極特殊專案恕不外借；請提供企劃書進入教牧會議，並確保當天有具備自主操作設備的同工，該同工需提前與行政進行技術對接。」
               </p>
             </div>
           </div>
@@ -787,7 +864,7 @@
           <div class="space-y-8">
             <div>
               <span class="text-sm font-black text-rose-400 tracking-widest uppercase">SECTION 09 - 防身說帖 (二)</span>
-              <h2 class="text-2xl sm:text-4xl font-black text-white mt-1">
+              <h2 class="text-3xl sm:text-5xl font-black text-white mt-1 leading-tight">
                 情境二：「我們機構經費很拮据、真的很需要幫助，能不能不要收費？」
               </h2>
             </div>
@@ -796,7 +873,7 @@
                 <span>🎯</span> 官方標準回應說帖
               </div>
               <p class="text-xl sm:text-3xl text-white font-bold leading-relaxed">
-                「教會收費並非為了營利，而是分攤必要之水電折舊與管理維護。若貴單位因報銷制度無法以租金核銷，可依特例專案改以『奉獻』方式辦理；若為睦鄰無收費公益活動，亦需送教牧會議評估。」
+                「懷恩堂的收費已經遠低於市場價格，收費是必要機電折舊與管理維護所需。貴單位在行收費時應將場地費用包含在其中，若無收費可協請提供更完整的企劃案，提請教牧會議評估。」
               </p>
             </div>
           </div>
@@ -805,13 +882,13 @@
       {
         id: 'script-scenario-3',
         category: '人情說帖 (三)',
-        title: '說帖三：「空間吃緊，但很需要週二晚大教室！」',
+        title: '說帖三：「空間吃緊，但很需要週三晚大教室！」',
         render: () => `
           <div class="space-y-8">
             <div>
               <span class="text-sm font-black text-rose-400 tracking-widest uppercase">SECTION 09 - 防身說帖 (三)</span>
-              <h2 class="text-2xl sm:text-4xl font-black text-white mt-1">
-                情境三：「雖然知道空間很吃緊，但真的很需要週二晚上的大教室！」
+              <h2 class="text-3xl sm:text-5xl font-black text-white mt-1 leading-tight">
+                情境三：「雖然知道空間很吃緊，但真的很需要週三晚上的大教室！」
               </h2>
             </div>
             <div class="p-6 sm:p-10 rounded-3xl bg-slate-800/90 border-2 border-slate-700 space-y-4">
@@ -819,7 +896,7 @@
                 <span>🎯</span> 官方標準回應說帖
               </div>
               <p class="text-xl sm:text-3xl text-white font-bold leading-relaxed">
-                「依據全堂安全管理標準，當週功能教室彈性已低於 3 間警戒線。若再外借，當內部詩班或敬拜團有突發牧養需求將無空間可用，為了保障教會自身事工推展，必須嚴格維持彈性空間儲備。」
+                「依據場地管理標準，當週功能教室彈性已低於 3 間警戒線。若再外借，當內部詩班或敬拜團有突發牧養需求將無空間可用，為了保障教會自身事工推展，必須嚴格維持彈性空間儲備。」
               </p>
             </div>
           </div>
@@ -833,7 +910,7 @@
           <div class="space-y-8">
             <div>
               <span class="text-sm font-black text-rose-400 tracking-widest uppercase">SECTION 09 - 防身說帖 (四)</span>
-              <h2 class="text-2xl sm:text-4xl font-black text-white mt-1">
+              <h2 class="text-3xl sm:text-5xl font-black text-white mt-1 leading-tight">
                 情境四：「外面下大雨、今天有很多長輩來，能不能開放三個臨時停車位？」
               </h2>
             </div>
@@ -853,17 +930,19 @@
         category: '提請審核',
         title: '總結：提請 執事會 審議核定',
         render: () => `
-          <div class="space-y-8 text-center max-w-3xl mx-auto flex flex-col items-center justify-center">
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-600/20 text-emerald-400 rounded-full text-sm font-bold border border-emerald-500/30">
-              📋 提案總結
+          <div class="space-y-8 w-full max-w-4xl text-left">
+            <div>
+              <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-600/20 text-emerald-400 rounded-full text-sm font-bold border border-emerald-500/30">
+                📋 提案總結
+              </div>
+              <h2 class="text-4xl sm:text-6xl font-black text-white tracking-tight mt-3">
+                提請 執事會 審議核定
+              </h2>
             </div>
-            <h2 class="text-4xl sm:text-6xl font-black text-white tracking-tight">
-              提請 執事會 審議核定
-            </h2>
-            <p class="text-xl sm:text-2xl text-slate-300 font-bold leading-relaxed">
+            <p class="text-xl sm:text-2xl text-slate-200 font-bold leading-relaxed border-l-4 border-emerald-500 pl-6">
               健全的收費與借用制度，是保護同工身心健康、促進資源公平合理分配的必要基石。
             </p>
-            <div class="pt-4 text-slate-400 text-base">
+            <div class="pt-2 text-slate-300 text-lg font-medium leading-relaxed bg-slate-800/60 p-6 rounded-2xl border border-slate-700">
               本辦法擬於執事會通過後，藉由每半年借用換約週期循序推動實施。
             </div>
           </div>
@@ -879,7 +958,8 @@
       document.getElementById('slide-counter').textContent = `PAGE ${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
       document.getElementById('slide-category').textContent = slide.category;
       document.getElementById('slide-viewport').innerHTML = slide.render();
-      document.getElementById('slide-select').value = index;
+      const selectEl = document.getElementById('slide-select');
+      if (selectEl) selectEl.value = index;
 
       // Update button states
       const prevBtn = document.getElementById('prev-btn');
@@ -960,14 +1040,16 @@
       }
     });
 
-    // Populate select options
+    // Populate select options if element exists
     const select = document.getElementById('slide-select');
-    slides.forEach((slide, idx) => {
-      const opt = document.createElement('option');
-      opt.value = idx;
-      opt.textContent = `${String(idx + 1).padStart(2, '0')}. ${slide.title}`;
-      select.appendChild(opt);
-    });
+    if (select) {
+      slides.forEach((slide, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = `${String(idx + 1).padStart(2, '0')}. ${slide.title}`;
+        select.appendChild(opt);
+      });
+    }
 
     // Initial render
     renderSlide(0);
