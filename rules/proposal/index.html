@@ -79,11 +79,47 @@
   </footer>
 
   <!-- 圖片燈箱 Modal -->
-  <div id="image-modal" onclick="closeImageModal()" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden items-center justify-center p-4 cursor-pointer">
-    <div class="relative max-w-5xl max-h-[90vh] bg-slate-900 rounded-3xl overflow-hidden border border-slate-700 shadow-2xl p-4 flex flex-col items-center">
-      <img id="modal-img" src="legacy_fee_table_97.jpg" alt="歷史文獻放大" class="max-w-full max-h-[80vh] object-contain -rotate-90">
-      <div class="p-3 text-center text-sm font-bold text-slate-300">
-        點擊任意處關閉放大檢視
+  <div id="image-modal" onclick="closeImageModal()" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden items-center justify-center p-2 sm:p-4 cursor-pointer">
+    <div class="relative w-full max-w-6xl max-h-[95vh] bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-700 shadow-2xl flex flex-col overflow-hidden cursor-default" onclick="event.stopPropagation()">
+      <!-- Modal Header / Controls -->
+      <div class="px-4 py-3 bg-slate-850 border-b border-slate-700 flex flex-wrap items-center justify-between gap-3 text-slate-200">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">📜</span>
+          <span class="font-bold text-sm sm:text-base text-white">歷史文獻：97.02 各場地設備及費用一覽表</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="zoomOut(event)" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-bold text-slate-200 transition-colors" title="縮小">
+            🔍 縮小 (−)
+          </button>
+          <span id="zoom-level-text" class="text-xs font-mono font-bold text-blue-400 min-w-[48px] text-center">100%</span>
+          <button onclick="zoomIn(event)" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-bold text-slate-200 transition-colors" title="放大">
+            🔍 放大 (+)
+          </button>
+          <button onclick="resetZoom(event)" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-bold text-slate-300 transition-colors" title="重設 100%">
+            ↺ 重設
+          </button>
+          <a href="legacy_fee_table_97.jpg" target="_blank" class="px-2.5 py-1 rounded-lg bg-blue-600/80 hover:bg-blue-600 border border-blue-500 text-xs font-bold text-white transition-colors" title="另開新分頁檢視原始大圖">
+            ↗ 新分頁開啟
+          </a>
+          <button onclick="closeImageModal()" class="ml-2 w-7 h-7 flex items-center justify-center rounded-lg bg-red-600/80 hover:bg-red-600 text-white font-bold text-sm transition-colors" title="關閉 (Esc)">
+            ✕
+          </button>
+        </div>
+      </div>
+      <!-- Modal Image Viewport with Scroll/Pan -->
+      <div id="modal-img-viewport" class="flex-1 overflow-auto p-4 flex items-center justify-center bg-black/40 min-h-[50vh] max-h-[78vh]">
+        <img
+          id="modal-img"
+          src="legacy_fee_table_97.jpg"
+          alt="歷史文獻放大"
+          onclick="toggleZoom(event)"
+          class="max-w-full max-h-full object-contain cursor-zoom-in transition-transform duration-200 shadow-xl rounded-lg"
+          style="transform-origin: center center;"
+        />
+      </div>
+      <!-- Modal Footer -->
+      <div class="px-4 py-2 bg-slate-850/80 border-t border-slate-800 text-center text-xs text-slate-400">
+        💡 提示：可使用右上角按鈕放大/縮小，或直接「點擊圖片」切換放大檢視，放大切換後可自由捲動表格各欄細節。
       </div>
     </div>
   </div>
@@ -385,8 +421,8 @@
                 >
                   <img
                     src="legacy_fee_table_97.jpg"
-                    alt="97年費用表（旋轉橫向）"
-                    class="max-h-[300px] w-auto object-contain -rotate-90 scale-125 group-hover:scale-130 transition-transform"
+                    alt="97年費用表"
+                    class="max-h-[280px] w-full object-contain group-hover:scale-105 transition-transform"
                   />
                   <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors flex items-center justify-center">
                     <span class="bg-blue-600/90 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg">
@@ -631,10 +667,10 @@
               <p class="text-base sm:text-lg text-slate-400 mt-1.5 font-medium">前提：全堂借用均需教牧遮蓋；行政判定的關鍵為「是否有同工群」</p>
             </div>
 
-            <!-- 直列三張卡片 (3 欄) -->
-            <div class="grid md:grid-cols-3 gap-4 sm:gap-6 w-full items-stretch">
-              <!-- 卡片 1: 內部事工 -->
-              <div class="p-5 sm:p-6 rounded-2xl bg-blue-950/40 border-2 border-blue-600/90 shadow-lg shadow-blue-950/30 flex flex-col justify-between space-y-4">
+            <!-- 直列三張卡片 (採 3 : 6 : 3 比例) -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-5 w-full items-stretch">
+              <!-- 卡片 1: 內部事工 (col-span-3) -->
+              <div class="md:col-span-3 p-5 sm:p-6 rounded-2xl bg-blue-950/40 border-2 border-blue-600/90 shadow-lg shadow-blue-950/30 flex flex-col justify-between space-y-4">
                 <div class="space-y-3">
                   <!-- [標籤][標籤] -->
                   <div class="flex flex-wrap items-center gap-1.5">
@@ -644,22 +680,23 @@
                   <!-- 圖片 標題 -->
                   <div class="flex items-center gap-2.5">
                     <span class="text-3xl">⛪</span>
-                    <h3 class="text-xl sm:text-2xl font-black text-white">內部事工（主辦）</h3>
+                    <h3 class="text-xl sm:text-2xl font-black text-white">內部事工</h3>
                   </div>
                   <!-- （說明） -->
-                  <p class="text-slate-200 text-sm sm:text-base leading-relaxed font-medium">
+                  <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-medium">
                     由懷恩堂教牧或核心團隊推動，為行政優先常駐支援對象。
                   </p>
                 </div>
                 <!-- 下方小文字 -->
-                <div class="pt-3 border-t border-blue-800/60 text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
-                  經執事會通過之年度事工，由各執事單位組執行，具備核心同工群。
+                <div class="pt-3 border-t border-blue-800/60 text-xs sm:text-sm text-slate-300 leading-relaxed font-medium space-y-1">
+                  <div class="text-emerald-300 font-bold">視為主辦。</div>
+                  <div>經執事會通過之年度事工，由各執事單位組執行，具備核心同工群。</div>
                 </div>
               </div>
 
-              <!-- 卡片 2: 會友實質借用 / 協辦事工 -->
-              <div class="p-5 sm:p-6 rounded-2xl bg-slate-850/90 border-2 border-slate-700/80 flex flex-col justify-between space-y-3.5">
-                <div class="space-y-2.5">
+              <!-- 卡片 2: 會友借用 / 協辦 (col-span-6 放大) -->
+              <div class="md:col-span-6 p-5 sm:p-6 rounded-2xl bg-slate-850/90 border-2 border-slate-700/80 flex flex-col justify-between space-y-3.5 shadow-xl">
+                <div class="space-y-3 flex-1 flex flex-col">
                   <!-- [標籤][標籤] -->
                   <div class="flex flex-wrap items-center gap-1.5">
                     <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/40">專屬減免</span>
@@ -671,32 +708,25 @@
                     <h3 class="text-xl sm:text-2xl font-black text-white">會友借用 / 協辦</h3>
                   </div>
                   <!-- 中間分上下區塊 -->
-                  <div class="space-y-2">
-                    <div class="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700">
-                      <strong class="text-amber-300 block text-xs sm:text-sm font-bold mb-0.5">會友實質借用</strong>
-                      <p class="text-slate-300 text-xs leading-relaxed">
+                  <div class="space-y-3 flex-1 flex flex-col justify-center pt-1">
+                    <div class="p-3.5 sm:p-4 rounded-xl bg-slate-800/90 border border-slate-700 space-y-1">
+                      <strong class="text-amber-300 block text-sm sm:text-base font-bold">會友借用</strong>
+                      <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-medium">
                         主辦方為會友（如婚喪）、主禮為本堂牧者、核心執行為本堂神學生/宣教士、活動對象多為會友（如廣場市集）。
                       </p>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700">
-                      <strong class="text-blue-300 block text-xs sm:text-sm font-bold mb-0.5">協辦事工</strong>
-                      <p class="text-slate-300 text-xs leading-relaxed">
+                    <div class="p-3.5 sm:p-4 rounded-xl bg-slate-800/90 border border-slate-700 space-y-1">
+                      <strong class="text-blue-300 block text-sm sm:text-base font-bold">協辦事工</strong>
+                      <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-medium">
                         主辦方雖非會友，但能動員本堂同工協助支援，於活動現場可自理，僅需行政作技術對接。
                       </p>
                     </div>
                   </div>
                 </div>
-                <!-- 特殊夥伴白名單（列於協辦事工下方） -->
-                <div class="pt-2 border-t border-slate-700/80 text-xs text-indigo-200 leading-relaxed font-medium bg-indigo-950/30 p-2.5 rounded-xl border border-indigo-800/50">
-                  <div class="flex items-center gap-1.5 font-bold text-white mb-0.5">
-                    <span>🏆</span><span>特殊夥伴（全額免費）</span>
-                  </div>
-                  浸信會神學院、周聯華牧師基金會由懷恩堂支持奉獻，全額免費（需自備同工群）。
-                </div>
               </div>
 
-              <!-- 卡片 3: 外部事工 -->
-              <div class="p-5 sm:p-6 rounded-2xl bg-amber-950/25 border-2 border-amber-800/70 flex flex-col justify-between space-y-4">
+              <!-- 卡片 3: 一般外部借用 (col-span-3) -->
+              <div class="md:col-span-3 p-5 sm:p-6 rounded-2xl bg-amber-950/25 border-2 border-amber-800/70 flex flex-col justify-between space-y-4">
                 <div class="space-y-3">
                   <!-- [標籤][標籤] -->
                   <div class="flex flex-wrap items-center gap-1.5">
@@ -709,7 +739,7 @@
                     <h3 class="text-xl sm:text-2xl font-black text-amber-300">一般外部借用</h3>
                   </div>
                   <!-- （說明） -->
-                  <p class="text-slate-200 text-sm sm:text-base leading-relaxed font-medium">
+                  <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-medium">
                     非本堂會友發起，未具上述實質條件之外部單位或基督教機構。
                   </p>
                 </div>
@@ -718,6 +748,18 @@
                   因無現場同工群，借用單位必須自備操作人員，依標準收費以補貼行政與機電維護成本。
                 </div>
               </div>
+            </div>
+
+            <!-- 特殊夥伴（最下方一排） -->
+            <div class="p-3.5 sm:p-4 rounded-2xl bg-indigo-950/40 border-2 border-indigo-700/60 text-indigo-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+              <div class="flex items-center gap-2.5">
+                <span class="text-2xl">🏆</span>
+                <h4 class="text-base sm:text-lg font-black text-white">特殊夥伴</h4>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">全額免費</span>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-200 font-medium">
+                浸信會神學院、周聯華牧師基金會由懷恩堂支持奉獻，全額免費（需自備同工群）。
+              </p>
             </div>
           </div>
         `
@@ -1054,20 +1096,82 @@
       }
     }
 
+    let currentZoom = 1;
+
+    function updateModalZoom(newZoom) {
+      currentZoom = Math.max(0.6, Math.min(2.5, Math.round(newZoom * 100) / 100));
+      const img = document.getElementById('modal-img');
+      if (img) {
+        img.style.transform = `scale(${currentZoom})`;
+        if (currentZoom > 1) {
+          img.classList.remove('cursor-zoom-in');
+          img.classList.add('cursor-zoom-out');
+        } else {
+          img.classList.remove('cursor-zoom-out');
+          img.classList.add('cursor-zoom-in');
+        }
+      }
+      const zoomText = document.getElementById('zoom-level-text');
+      if (zoomText) {
+        zoomText.textContent = `${Math.round(currentZoom * 100)}%`;
+      }
+    }
+
+    function zoomIn(e) {
+      if (e) e.stopPropagation();
+      updateModalZoom(currentZoom + 0.25);
+    }
+
+    function zoomOut(e) {
+      if (e) e.stopPropagation();
+      updateModalZoom(currentZoom - 0.25);
+    }
+
+    function resetZoom(e) {
+      if (e) e.stopPropagation();
+      updateModalZoom(1);
+    }
+
+    function toggleZoom(e) {
+      if (e) e.stopPropagation();
+      if (currentZoom === 1) {
+        updateModalZoom(1.5);
+      } else {
+        updateModalZoom(1);
+      }
+    }
+
     function openImageModal() {
       const modal = document.getElementById('image-modal');
       modal.classList.remove('hidden');
       modal.classList.add('flex');
+      updateModalZoom(1);
     }
 
     function closeImageModal() {
       const modal = document.getElementById('image-modal');
       modal.classList.remove('flex');
       modal.classList.add('hidden');
+      updateModalZoom(1);
     }
 
     // Keyboard navigation
     window.addEventListener('keydown', (e) => {
+      const modal = document.getElementById('image-modal');
+      const isModalOpen = modal && !modal.classList.contains('hidden');
+
+      if (e.key === 'Escape') {
+        if (isModalOpen) {
+          closeImageModal();
+          return;
+        }
+      }
+
+      if (isModalOpen) {
+        // 當燈箱開啟時，不觸發投影片切換
+        return;
+      }
+
       if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
         e.preventDefault();
         nextSlide();
