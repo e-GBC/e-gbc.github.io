@@ -194,43 +194,129 @@
       },
       {
         id: 'priority',
-        category: 'SECTION 04 - 優先順位',
-        title: '場地借用之事工優先順位',
+        category: 'SECTION 04 - 基本原則',
+        title: '場地借用基本原則',
+        render: () => `
+          <div class="space-y-6 w-full text-left">
+            <div class="text-center">
+              <span class="text-sm font-black text-blue-600 tracking-widest uppercase">SECTION 04 - 基本原則</span>
+              <h2 class="text-3xl sm:text-5xl font-black text-slate-900 mt-1">場地借用基本原則</h2>
+              <p class="text-lg text-slate-500 mt-2 font-medium">以堂內事工為絕對優先・持守安息與信仰界線</p>
+            </div>
+            <div class="space-y-4">
+              <!-- 區塊 1: 本堂事工優先與借用順序原則 -->
+              <div class="p-5 sm:p-6 rounded-2xl bg-blue-50/70 border-2 border-blue-200 space-y-3 shadow-sm">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-2xl">📌</span>
+                  <h3 class="text-xl sm:text-2xl font-black text-slate-900">本堂事工優先與借用順序原則</h3>
+                </div>
+                <p class="text-slate-700 text-sm sm:text-base leading-relaxed font-medium">
+                  本堂各空間與教室之借用，皆以<strong>懷恩堂內部事工為絕對優先</strong>。
+                </p>
+                <!-- 順序膠囊標籤 (對照範例圖與線上管理辦法) -->
+                <div class="bg-white border border-blue-200 p-3.5 sm:p-4 rounded-xl shadow-sm space-y-2">
+                  <div class="font-bold text-blue-900 text-xs sm:text-sm">【場地優先使用順序】</div>
+                  <div class="text-xs sm:text-sm font-bold text-slate-700 flex flex-wrap gap-1.5 sm:gap-2 items-center">
+                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg">教會特會</span>
+                    <span class="text-slate-400">▶</span>
+                    <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg border border-blue-100">教會崇拜</span>
+                    <span class="text-slate-400">▶</span>
+                    <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg">外部借用特會</span>
+                    <span class="text-slate-400">▶</span>
+                    <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg">主日學</span>
+                    <span class="text-slate-400">▶</span>
+                    <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg">團契</span>
+                    <span class="text-slate-400">▶</span>
+                    <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg">詩班練習</span>
+                  </div>
+                </div>
+                <p class="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
+                  一般固定且重複性的會議、敬拜練習或團契活動，皆有被協調調動或更換場地的可能。
+                </p>
+              </div>
+
+              <!-- 區塊 2: 週一及國定連續假日不外借 -->
+              <div class="p-5 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-2 shadow-sm">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-2xl">📌</span>
+                  <h3 class="text-xl sm:text-2xl font-black text-slate-900">週一及國定連續假日不外借</h3>
+                </div>
+                <p class="text-slate-700 text-sm sm:text-base leading-relaxed font-medium">
+                  週一為行政/教牧/清潔人力調度公休與全堂機電修整日，為持守身心安息，非極特殊情況一律不外借。<br />
+                  特殊活動需提請教牧會議，並請自行預備同工處理場務需求。
+                </p>
+              </div>
+
+              <!-- 區塊 3: 信仰宗派原則與嚴禁商業營利 -->
+              <div class="p-5 sm:p-6 rounded-2xl bg-rose-50/70 border-2 border-rose-200 space-y-2 shadow-sm">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-2xl">📌</span>
+                  <h3 class="text-xl sm:text-2xl font-black text-rose-900">信仰宗派原則與嚴禁商業營利</h3>
+                </div>
+                <p class="text-slate-700 text-sm sm:text-base leading-relaxed font-medium">
+                  活動內容不得違背基督教基本信仰，嚴禁異端教派借用。無關信仰之外部團體借用需呈報教牧會議核准；全堂嚴禁推銷、買賣或商業抽成行為。
+                </p>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        id: 'portal-system',
+        category: 'SECTION 05 - 系統支援',
+        title: '現場場地管理系統',
         render: () => `
           <div class="space-y-6 w-full text-left">
             <div>
-              <span class="text-sm font-black text-blue-600 tracking-widest uppercase">SECTION 04 - 優先順位</span>
-              <h2 class="text-3xl sm:text-5xl font-black text-slate-900 mt-1">場地借用之事工優先順位</h2>
-              <p class="text-lg text-slate-500 mt-2 font-medium">堂內核心事工絕對優先・階段性特會具調動機制</p>
+              <span class="text-sm font-black text-blue-600 tracking-widest uppercase">SECTION 05 - 線上平台</span>
+              <h2 class="text-3xl sm:text-5xl font-black text-slate-900 mt-1">現場場地管理系統</h2>
+              <p class="text-lg text-slate-500 mt-2 font-medium">台北懷恩堂數位行政管理平台 — 教室借用查詢與管理</p>
             </div>
-            <div class="space-y-4">
-              <div class="p-5 sm:p-6 rounded-2xl bg-blue-50/70 border-2 border-blue-200 flex items-start gap-4 shadow-sm">
-                <span class="text-3xl">⛪</span>
-                <div>
-                  <h3 class="text-xl sm:text-2xl font-black text-slate-900 mb-1">一、內部事工絕對優先（免場地費）</h3>
+
+            <div class="grid md:grid-cols-12 gap-6 items-center">
+              <!-- 左邊：系統介紹與功能說明 (col-span-7) -->
+              <div class="md:col-span-7 space-y-4">
+                <div class="p-5 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-3 shadow-sm">
+                  <div class="flex items-center gap-2 text-blue-700 font-bold text-base">
+                    <span>⛪</span>
+                    <span>egbc-portal.vercel.app</span>
+                  </div>
+                  <h3 class="text-2xl font-black text-slate-900">即時課表與場地管理專區</h3>
                   <p class="text-slate-700 text-sm sm:text-base leading-relaxed font-medium">
-                    各空間與教室之借用，皆以<strong>懷恩堂內部事工為絕對優先</strong>。經執事會通過之常態崇拜、聚會、團契與相關練習，免收場地使用費。
+                    隨時掌握全堂各教室、大堂、樂民館之即時動態與借用狀況，讓事工同工與會友透明查閱。
                   </p>
+                  <ul class="text-slate-600 text-xs sm:text-sm space-y-2 list-disc pl-5 font-medium">
+                    <li><strong>即時課表檢視</strong>：首頁日課表、日資源報表與借用單位清單</li>
+                    <li><strong>場地比較器</strong>：容量、桌椅型態、設備一覽快速對照</li>
+                    <li><strong>線上管理辦法專頁</strong>：白紙黑字公開透明，免除個案臆測</li>
+                  </ul>
+                  <div class="pt-2">
+                    <a
+                      href="https://egbc-portal.vercel.app/"
+                      target="_blank"
+                      class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition shadow-sm"
+                    >
+                      🌐 開啟現場管理系統 ↗
+                    </a>
+                  </div>
                 </div>
               </div>
 
-              <div class="p-5 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 flex items-start gap-4 shadow-sm">
-                <span class="text-3xl">📅</span>
+              <!-- 右邊：大型 QR Code 供現場掃描 (col-span-5) -->
+              <div class="md:col-span-5 flex flex-col items-center justify-center p-6 bg-white border-2 border-slate-200 rounded-3xl shadow-md text-center space-y-3">
+                <a href="https://egbc-portal.vercel.app/" target="_blank" class="group block relative p-2 bg-slate-50 rounded-2xl border border-slate-200 hover:border-blue-500 transition">
+                  <img
+                    src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=https%3A%2F%2Fegbc-portal.vercel.app%2F"
+                    alt="現場場地管理系統 QR Code"
+                    class="w-52 h-52 sm:w-60 sm:h-60 object-contain rounded-xl group-hover:scale-105 transition-transform"
+                  />
+                  <div class="absolute inset-0 bg-blue-600/10 opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity flex items-center justify-center">
+                    <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-lg shadow">點擊直接開啟</span>
+                  </div>
+                </a>
                 <div>
-                  <h3 class="text-xl sm:text-2xl font-black text-slate-900 mb-1">二、階段性大型活動調動機制</h3>
-                  <p class="text-slate-700 text-sm sm:text-base leading-relaxed font-medium">
-                    重要大型活動、階段性牧養特會、佈道會、婚喪禮拜具有優先借用權。一般固定重複性之會議或練習，均有被協調調動或更換場地之可能。
-                  </p>
-                </div>
-              </div>
-
-              <div class="p-5 sm:p-6 rounded-2xl bg-rose-50/70 border-2 border-rose-200 flex items-start gap-4 shadow-sm">
-                <span class="text-3xl">🚫</span>
-                <div>
-                  <h3 class="text-xl sm:text-2xl font-black text-rose-900 mb-1">三、信仰純正守望與嚴禁商業營利</h3>
-                  <p class="text-slate-700 text-sm sm:text-base leading-relaxed font-medium">
-                    活動內容不得違背基督教基本信仰，嚴禁異端教派借用。無關信仰之外部團體借用需呈報主任牧師核准；<strong>全堂嚴禁推銷、買賣或商業抽成行為</strong>。
-                  </p>
+                  <div class="text-sm font-black text-slate-800">📱 請以手機掃描進入系統</div>
+                  <div class="text-xs text-slate-500 font-mono mt-0.5">https://egbc-portal.vercel.app/</div>
                 </div>
               </div>
             </div>
@@ -238,56 +324,56 @@
         `
       },
       {
-        id: 'timing',
-        category: 'SECTION 05 - 時間規範',
-        title: '借用時間規範與標準時段制',
+        id: 'duration-evaluation',
+        category: 'SECTION 06 - 借用評估',
+        title: '借用時長與行政評估依據',
         render: () => `
           <div class="space-y-6 w-full text-left">
             <div>
-              <span class="text-sm font-black text-emerald-600 tracking-widest uppercase">SECTION 05 - 時間規範</span>
-              <h2 class="text-3xl sm:text-5xl font-black text-slate-900 mt-1">借用時間規範與標準時段制</h2>
-              <p class="text-lg text-slate-500 mt-2 font-medium">劃分早中晚標準時段・週一全天公休修整</p>
+              <span class="text-sm font-black text-blue-600 tracking-widest uppercase">SECTION 06 - 借用評估</span>
+              <h2 class="text-3xl sm:text-5xl font-black text-slate-900 mt-1">借用時長與行政評估依據</h2>
+              <p class="text-lg text-slate-500 mt-2 font-medium">單次借用分級申請・長期借用以半年為限審慎審查</p>
             </div>
-            <div class="grid sm:grid-cols-3 gap-5">
-              <div class="p-5 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-2 shadow-sm">
-                <div class="text-3xl">🗓️</div>
-                <h3 class="text-xl font-black text-slate-900">週一公休修整</h3>
-                <p class="text-slate-700 text-sm sm:text-base leading-relaxed font-medium">
-                  週一為行政/教牧/清潔人力調度公休與全堂機電修整日，非極特殊情況一律不外借。
-                </p>
-              </div>
-
-              <div class="p-5 sm:p-6 rounded-2xl bg-blue-50/70 border-2 border-blue-200 space-y-2 shadow-sm">
-                <div class="text-3xl">⏱️</div>
-                <h3 class="text-xl font-black text-slate-900">標準時段制（包套全包）</h3>
-                <ul class="text-slate-700 text-xs sm:text-sm leading-relaxed font-medium space-y-1">
-                  <li><strong>早段：</strong>07:00 ～ 12:00</li>
-                  <li><strong>午段：</strong>12:00 ～ 17:00</li>
-                  <li><strong>晚段：</strong>17:00 ～ 22:00</li>
-                  <li>跨時段以 2 時段計。含冷氣、投影與附屬休息室，不再零碎加價。</li>
+            <div class="grid md:grid-cols-2 gap-6 text-sm sm:text-base">
+              <div class="p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-3 shadow-sm">
+                <div class="flex items-center gap-2.5 text-blue-700 font-black text-xl">
+                  <span class="text-2xl">📅</span>
+                  <h3>單次 / 臨時借用</h3>
+                </div>
+                <ul class="text-slate-700 leading-relaxed font-medium space-y-2 list-disc pl-5">
+                  <li><strong>需行政技術支援</strong>：事工必須於 <strong>2 個月前</strong> 提出借用。</li>
+                  <li><strong>三日內場地</strong>：常規無繁複設備需求之場地，幾乎皆可彈性臨時借用。</li>
+                  <li><strong>兩週內彈性保留</strong>：為保留臨時牧養需要，非兩週內的預約有可能被協調挪用。</li>
                 </ul>
               </div>
 
-              <div class="p-5 sm:p-6 rounded-2xl bg-emerald-50/70 border-2 border-emerald-200 space-y-2 shadow-sm">
-                <div class="text-3xl">🎭</div>
-                <h3 class="text-xl font-black text-slate-900">彩排與佈置規範</h3>
-                <p class="text-slate-700 text-xs sm:text-sm leading-relaxed font-medium">
-                  <strong>第 1 個額外彩排/佈置時段：免費 (0元)</strong>。<br />
-                  第 2 個（含）以上時段依標準費率計價。彩排佈置與撤場復原均需於借用時段內完成。
-                </p>
+              <div class="p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-3 shadow-sm">
+                <div class="flex items-center gap-2.5 text-purple-700 font-black text-xl">
+                  <span class="text-2xl">🔒</span>
+                  <h3>長期借用需審慎評估</h3>
+                </div>
+                <ul class="text-slate-700 leading-relaxed font-medium space-y-2 list-disc pl-5">
+                  <li><strong>邊間緩衝保障</strong>：週間邊間教室（如 205, 301, 401）低於 3 間時，一律不予外部長期借用。</li>
+                  <li><strong>同工群自理</strong>：長期借用單位必須有可自行操作設備之同工群。</li>
+                  <li><strong>半年審查期</strong>：非核心事工以半年為一期審查，期滿需重新填單送審。</li>
+                </ul>
               </div>
+            </div>
+            <div class="p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs sm:text-sm font-bold flex items-center gap-2">
+              <span>ℹ️</span>
+              <span><strong>重要備註：</strong>崇拜/禱告會、大型營會特會、外部具備高福音意義活動為必須事工，不在此列。</span>
             </div>
           </div>
         `
       },
       {
         id: 'user-types',
-        category: 'SECTION 06 - 資格判定',
+        category: 'SECTION 07 - 資格判定',
         title: '借用者類型判定與收費界線',
         render: () => `
           <div class="space-y-6 w-full text-left">
             <div>
-              <span class="text-sm font-black text-blue-600 tracking-widest uppercase">SECTION 06 - 資格判定</span>
+              <span class="text-sm font-black text-blue-600 tracking-widest uppercase">SECTION 07 - 資格判定</span>
               <h2 class="text-3xl sm:text-5xl font-black text-slate-900 mt-1">借用者類型判定與收費界線</h2>
               <p class="text-base sm:text-lg text-slate-500 mt-1 font-medium">前提：全堂借用均需教牧遮蓋；行政判定的關鍵為「是否有同工群現場自理」</p>
             </div>
@@ -378,49 +464,6 @@
         `
       },
       {
-        id: 'duration-evaluation',
-        category: 'SECTION 07 - 借用評估',
-        title: '借用時長與行政評估依據',
-        render: () => `
-          <div class="space-y-6 w-full text-left">
-            <div>
-              <span class="text-sm font-black text-blue-600 tracking-widest uppercase">SECTION 07 - 借用評估</span>
-              <h2 class="text-3xl sm:text-5xl font-black text-slate-900 mt-1">借用時長與行政評估依據</h2>
-              <p class="text-lg text-slate-500 mt-2 font-medium">單次借用分級申請・長期借用以半年為限審慎審查</p>
-            </div>
-            <div class="grid md:grid-cols-2 gap-6 text-sm sm:text-base">
-              <div class="p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-3 shadow-sm">
-                <div class="flex items-center gap-2.5 text-blue-700 font-black text-xl">
-                  <span class="text-2xl">📅</span>
-                  <h3>單次 / 臨時借用</h3>
-                </div>
-                <ul class="text-slate-700 leading-relaxed font-medium space-y-2 list-disc pl-5">
-                  <li><strong>需行政技術支援</strong>：事工必須於 <strong>2 個月前</strong> 提出借用。</li>
-                  <li><strong>三日內場地</strong>：常規無繁複設備需求之場地，幾乎皆可彈性臨時借用。</li>
-                  <li><strong>兩週內彈性保留</strong>：為保留臨時牧養需要，非兩週內的預約有可能被協調挪用。</li>
-                </ul>
-              </div>
-
-              <div class="p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-3 shadow-sm">
-                <div class="flex items-center gap-2.5 text-purple-700 font-black text-xl">
-                  <span class="text-2xl">🔒</span>
-                  <h3>長期借用需審慎評估</h3>
-                </div>
-                <ul class="text-slate-700 leading-relaxed font-medium space-y-2 list-disc pl-5">
-                  <li><strong>邊間緩衝保障</strong>：週間邊間教室（如 205, 301, 401）低於 3 間時，一律不予外部長期借用。</li>
-                  <li><strong>同工群自理</strong>：長期借用單位必須有可自行操作設備之同工群。</li>
-                  <li><strong>半年審查期</strong>：非核心事工以半年為一期審查，期滿需重新填單送審。</li>
-                </ul>
-              </div>
-            </div>
-            <div class="p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs sm:text-sm font-bold flex items-center gap-2">
-              <span>ℹ️</span>
-              <span><strong>重要備註：</strong>崇拜/禱告會、大型營會特會、外部具備高福音意義活動為必須事工，不在此列。</span>
-            </div>
-          </div>
-        `
-      },
-      {
         id: 'fees',
         category: 'SECTION 08 - 收費標準',
         title: '收費標準表與核心精神',
@@ -504,19 +547,13 @@
               <h2 class="text-3xl sm:text-5xl font-black text-slate-900 mt-1">場地復原：不是為難，而是體貼下一位服事者</h2>
               <p class="text-lg text-slate-500 mt-2 font-medium">前一組若未復原，會讓下一個使用者極度慌亂，造成連鎖負擔</p>
             </div>
+            <!-- 左右交換：左邊 SOP，右邊 WHY -->
             <div class="grid md:grid-cols-2 gap-6">
-              <div class="p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-3 shadow-sm">
-                <div class="text-3xl">🧹</div>
-                <h3 class="text-xl font-black text-slate-900">為什麼必須嚴格要求場地復原？</h3>
-                <p class="text-slate-700 text-sm sm:text-base leading-relaxed font-medium">
-                  借用結束後恢復原貌，是彼此相愛與尊重的具體表現。若上一組未關電源、未收麥克風、椅子凌亂，下一組同工抵達時將陷入手忙腳亂與慌亂，行政同工也必須疲於奔命。
-                </p>
-              </div>
-
+              <!-- 左邊：SOP -->
               <div class="p-6 rounded-2xl bg-blue-50/70 border-2 border-blue-200 space-y-2 shadow-sm">
                 <div class="text-3xl">✅</div>
                 <h3 class="text-xl font-black text-slate-900">標準復原 6 點 SOP（以樂民館為例）</h3>
-                <ol class="text-slate-700 text-xs sm:text-sm leading-relaxed font-medium space-y-1 list-decimal pl-5">
+                <ol class="text-slate-700 text-xs sm:text-sm leading-relaxed font-medium space-y-1.5 list-decimal pl-5">
                   <li>關閉舞台音控系統、多媒體台開關（如果有啟用）、插座電源</li>
                   <li>關閉主控室音控台、副電源、總電源</li>
                   <li>將音控台、電子琴的保護布蓋上</li>
@@ -524,6 +561,18 @@
                   <li>舞台麥克風、監聽放回主控室設備區按順序擺放</li>
                   <li>關閉所有室內與走道照明</li>
                 </ol>
+              </div>
+
+              <!-- 右邊：WHY -->
+              <div class="p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-3 shadow-sm">
+                <div class="text-3xl">🧹</div>
+                <h3 class="text-xl font-black text-slate-900">為什麼必須嚴格要求場地復原？</h3>
+                <p class="text-slate-700 text-sm sm:text-base leading-relaxed font-medium">
+                  借用結束後恢復原貌，是彼此相愛與尊重的具體表現。若上一組未關電源、未收麥克風、椅子凌亂，下一組同工抵達時將陷入手忙腳亂與慌亂，行政同工也必須疲於奔命處理善後。
+                </p>
+                <div class="pt-2 text-xs sm:text-sm text-slate-500 font-bold border-t border-slate-200">
+                  落實場地復原，讓每一位進入神家的服事者都能在平安中順暢聚會。
+                </div>
               </div>
             </div>
             <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs sm:text-sm font-bold flex items-center gap-2">
@@ -579,35 +628,68 @@
       },
       {
         id: 'equipment-and-future',
-        category: 'SECTION 11 - 配套措施 (三)',
-        title: '臨時設備需求與全數位化願景',
+        category: 'SECTION 11 - 數位願景',
+        title: '全數位化願景與支持工具',
         render: () => `
           <div class="space-y-6 w-full text-left">
             <div>
-              <span class="text-sm font-black text-purple-600 tracking-widest uppercase">SECTION 11 - 配套措施 (三)</span>
-              <h2 class="text-3xl sm:text-5xl font-black text-slate-900 mt-1">臨時設備需求與全數位化願景</h2>
-              <p class="text-lg text-slate-500 mt-2 font-medium">設備需事前登記・逐步建置線上說明書與表單系統</p>
+              <span class="text-sm font-black text-purple-600 tracking-widest uppercase">SECTION 11 - 數位藍圖</span>
+              <h2 class="text-3xl sm:text-5xl font-black text-slate-900 mt-1">全數位化願景與支持工具</h2>
+              <p class="text-lg text-slate-500 mt-2 font-medium">系統升級・支持工具・硬體智慧化管理三軸推進</p>
             </div>
-            <div class="grid md:grid-cols-2 gap-6">
-              <div class="p-6 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-3 shadow-sm">
-                <div class="text-3xl">🎹</div>
-                <h3 class="text-xl font-black text-slate-900">臨時設備借用規範</h3>
-                <ul class="text-slate-700 text-xs sm:text-sm leading-relaxed font-medium space-y-2 list-disc pl-5">
-                  <li><strong>事前登記</strong>：影音投影、無線麥克風等設備請於申請時登記；活動當日恕無法保證提供額外臨時調度。</li>
-                  <li><strong>貴重樂器維護</strong>：管風琴原則不外借；鋼琴上方嚴禁放置任何物品與雜物。</li>
-                </ul>
+
+            <!-- 卡片改成三張 -->
+            <div class="grid sm:grid-cols-3 gap-5">
+              <!-- 卡片 1: 系統持續升級 -->
+              <div class="p-5 sm:p-6 rounded-2xl bg-blue-50/70 border-2 border-blue-200 space-y-3 shadow-sm flex flex-col justify-between">
+                <div class="space-y-3">
+                  <div class="text-3xl">🚀</div>
+                  <h3 class="text-xl font-black text-slate-900">1. 系統持續升級</h3>
+                  <ul class="text-slate-700 text-xs sm:text-sm leading-relaxed font-medium space-y-2 list-disc pl-5">
+                    <li><strong>借用維持行政調度</strong></li>
+                    <li><strong>線上申請與企劃案繳交</strong></li>
+                    <li><strong>線上場地復原回報</strong></li>
+                    <li><strong>單位活動取消與調度申請</strong></li>
+                  </ul>
+                </div>
+                <div class="pt-2 text-xs text-blue-700 font-bold border-t border-blue-200/80">
+                  全流程線上表單化
+                </div>
               </div>
 
-              <div class="p-6 rounded-2xl bg-blue-50/70 border-2 border-blue-200 space-y-3 shadow-sm">
-                <div class="text-3xl">💻</div>
-                <h3 class="text-xl font-black text-slate-900">全數位化願景與懇請體諒</h3>
-                <p class="text-slate-700 text-xs sm:text-sm leading-relaxed font-medium">
-                  最理想的狀況是一切全線上：辦法、借用、檢查、復原皆有線上表單。行政目前在人力有限並推動各項新事工的狀況下，正逐步踏實建置，懇請執事會給予時間、包容與代禱支持！
-                </p>
+              <!-- 卡片 2: 更豐富的支持工具 -->
+              <div class="p-5 sm:p-6 rounded-2xl bg-emerald-50/70 border-2 border-emerald-200 space-y-3 shadow-sm flex flex-col justify-between">
+                <div class="space-y-3">
+                  <div class="text-3xl">🛠️</div>
+                  <h3 class="text-xl font-black text-slate-900">2. 更豐富的支持工具</h3>
+                  <ul class="text-slate-700 text-xs sm:text-sm leading-relaxed font-medium space-y-2 list-disc pl-5">
+                    <li><strong>設備借用系統</strong></li>
+                    <li><strong>修繕報備系統</strong></li>
+                    <li><strong>同工登記系統</strong></li>
+                  </ul>
+                </div>
+                <div class="pt-2 text-xs text-emerald-700 font-bold border-t border-emerald-200/80">
+                  一站式數位行政支持
+                </div>
+              </div>
+
+              <!-- 卡片 3: 智慧教室門鎖 -->
+              <div class="p-5 sm:p-6 rounded-2xl bg-purple-50/70 border-2 border-purple-200 space-y-3 shadow-sm flex flex-col justify-between">
+                <div class="space-y-3">
+                  <div class="text-3xl">🔐</div>
+                  <h3 class="text-xl font-black text-slate-900">3. 智慧教室門鎖</h3>
+                  <p class="text-slate-700 text-xs sm:text-sm leading-relaxed font-medium">
+                    未來將陸續更動教室門為<strong>智慧門鎖</strong>，免除領取與歸還實體鑰匙之繁複，並便於行政即時管理與使用數據統計。
+                  </p>
+                </div>
+                <div class="pt-2 text-xs text-purple-700 font-bold border-t border-purple-200/80">
+                  硬體智慧化管理升級
+                </div>
               </div>
             </div>
+
             <div class="p-4 rounded-xl bg-slate-100 border border-slate-300 text-slate-700 text-xs sm:text-sm font-semibold flex items-center justify-between">
-              <span>📖 各場地設備與空間操作說明書（大堂、樂民館、各樓層教室）正分階段編製上線。</span>
+              <span>💡 行政部目前在有限人力與推動各項新事工的狀況下，正逐步踏實建置，懇請執事會給予時間、包容與代禱支持！</span>
             </div>
           </div>
         `
